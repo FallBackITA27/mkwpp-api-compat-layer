@@ -1,0 +1,1 @@
+This library is a sort of compatibility layer meant to define all the inputs/outputs with the backend.
