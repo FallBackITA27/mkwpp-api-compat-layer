@@ -2,13 +2,13 @@ use crate::request_method;
 
 pub mod cups;
 
-enum RequiredPermission {
+pub enum RequiredPermission {
     None,
     LoggedIn,
     Admin,
 }
 
-trait Endpoint {
+pub trait Endpoint {
     const PATH: &'static str;
     const REQUEST_METHOD: request_method::RequestMethod;
     const REQUIRED_PERMISSION: RequiredPermission;
@@ -19,7 +19,7 @@ trait Endpoint {
     type ScopeStruct: Scope;
 }
 
-trait Scope {
+pub trait Scope {
     const PATH: &'static str;
     type OuterScope: Scope;
     
