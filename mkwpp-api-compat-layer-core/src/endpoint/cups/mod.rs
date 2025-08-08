@@ -1,13 +1,14 @@
 use crate::{
-    endpoint::{Endpoint, RequiredPermission, Scope},
+    endpoint::{Endpoint, RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };
 
 pub struct CupsScope;
+
 impl Scope for CupsScope {
     const PATH: &'static str = "/cups";
 
-    type OuterScope = ();
+    type OuterScope = Root;
 }
 
 pub struct GetCups;

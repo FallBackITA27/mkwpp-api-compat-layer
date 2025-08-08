@@ -4,8 +4,15 @@ version = "0.1.0"
 edition = "2024"
 
 [dependencies]
+actix-web = { version = "4.11.0", optional = true }
+paste = "1.0.15"
 serde = "1.0.219"
 serde_json = "1.0.142"
 
+[features]
+default = ["rust_actix"]
+rust_actix = ["dep:actix-web"]
+
 [lints]
 workspace = true
+
