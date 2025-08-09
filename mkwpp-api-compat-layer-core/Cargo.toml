@@ -1,6 +1,6 @@
 [package]
 name = "mkwpp-api-compat-layer-core"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 
 [dependencies]
@@ -10,8 +10,8 @@ serde = "1.0.219"
 serde_json = "1.0.142"
 
 [features]
-default = ["rust_actix"]
-rust_actix = ["dep:actix-web"]
+default = []
+rust-actix = ["dep:actix-web"]
 
 [lints]
 workspace = true

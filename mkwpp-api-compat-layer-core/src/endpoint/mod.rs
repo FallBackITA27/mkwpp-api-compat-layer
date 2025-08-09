@@ -26,6 +26,6 @@ pub trait Scope {
 pub struct Root;
 
 impl Scope for Root {
-    const PATH: &'static str = "";
+    const PATH: &'static str = "/v1";
     type OuterScope = Root;
 }

@@ -10,7 +10,7 @@ use super::to_route::ToActixRoute;
 macro_rules! to_actix_scope_macro {
     ($scope_name:ident) => {
         impl $scope_name {
-            fn to_actix_scope() -> actix_web::Scope {
+            pub fn to_actix_scope() -> actix_web::Scope {
                 web::scope(Self::PATH)
             }
         }
@@ -18,7 +18,7 @@ macro_rules! to_actix_scope_macro {
     ($scope_name:ident; $($route:ident),*) => {
         impl $scope_name {
             paste! { 
-                fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
+                pub fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
                 where
                     F: Handler<Args>,
                     Args: FromRequest + 'static,
@@ -33,7 +33,7 @@ macro_rules! to_actix_scope_macro {
     ($scope_name:ident; $($route:ident),*; $($scope:ident),*) => {
         impl $scope_name {
             paste! { 
-                fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
+                pub fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
                 where
                     F: Handler<Args>,
                     Args: FromRequest + 'static,

@@ -1,2 +1,2 @@
-#[cfg(feature = "rust_actix")]
+#[cfg(feature = "rust-actix")]
 pub mod rust_actix;
