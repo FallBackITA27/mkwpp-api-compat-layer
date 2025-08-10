@@ -6,6 +6,7 @@ pub mod error;
 pub mod from_input;
 pub mod to_route;
 pub mod to_scope;
+pub mod common_types;
 
 impl From<RequestMethod> for http::Method {
     fn from(val: RequestMethod) -> Self {

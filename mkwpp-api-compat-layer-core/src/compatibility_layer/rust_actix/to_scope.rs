@@ -3,6 +3,7 @@ use crate::{
     endpoint::{
         Endpoint, Root, Scope,
         cups::{CupsScope, GetCups},
+        tracks::{TracksScope,GetTracks}
     },
     error::FinalErrorResponse,
 };
@@ -46,3 +47,4 @@ macro_rules! to_actix_scope_macro {
 
 to_actix_scope_macro!(Root);
 to_actix_scope_macro!(CupsScope; GetCups);
+to_actix_scope_macro!(TracksScope; GetTracks);

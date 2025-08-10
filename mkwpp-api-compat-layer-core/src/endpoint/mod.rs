@@ -1,6 +1,7 @@
 use crate::{request_method::RequestMethod, required_permission::RequiredPermission};
 
 pub mod cups;
+pub mod tracks;
 pub mod players;
 
 pub trait Endpoint: Default {
