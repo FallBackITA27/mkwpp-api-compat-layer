@@ -23,6 +23,7 @@ impl Endpoint for GetCups {
     type ScopeStruct = CupsScope;
 }
 
+#[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 pub struct GetCupsOutput {
     pub id: i32,
     pub code: &'static str,

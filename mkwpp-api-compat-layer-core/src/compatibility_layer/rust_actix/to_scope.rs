@@ -1,11 +1,10 @@
-use actix_web::{FromRequest, Handler, Responder, Route, web};
-use paste::paste;
+use super::{from_input::InputFromActix, to_route::ToActixRoute};
 use crate::endpoint::{
     Endpoint, Root, Scope,
     cups::{CupsScope, GetCups},
-    players::PlayersScope,
 };
-use super::to_route::ToActixRoute;
+use actix_web::web;
+use paste::paste;
 
 macro_rules! to_actix_scope_macro {
     ($scope_name:ident) => {
@@ -17,34 +16,29 @@ macro_rules! to_actix_scope_macro {
     };
     ($scope_name:ident; $($route:ident),*) => {
         impl $scope_name {
-            paste! { 
-                pub fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
-                where
-                    F: Handler<Args>,
-                    Args: FromRequest + 'static,
-                    F::Output: Responder + 'static
+            paste! {
+                pub fn to_actix_scope(
+                    $([< $route:snake _handler >]:
+                        impl AsyncFn(<$route as Endpoint>::InputStruct)
+                            -> <$route as Endpoint>::OutputStruct + 'static
+                    ),*
+                ) -> actix_web::Scope
+                    where
+                        $(
+                            <$route as Endpoint>::InputStruct: InputFromActix,
+                            <$route as Endpoint>::OutputStruct: serde::Serialize
+                        ),*
                 {
-                        web::scope(Self::PATH)
-                        $( .route($route::PATH, $route::to_actix_route([< $route:snake _handler >])))*
+                    web::scope(Self::PATH)
+                    $(
+                        .route(
+                            $route::PATH, $route::to_actix_route([< $route:snake _handler >])
+                        )
+                    )*
                 }
             }
         }
     };
-    ($scope_name:ident; $($route:ident),*; $($scope:ident),*) => {
-        impl $scope_name {
-            paste! { 
-                pub fn to_actix_scope<F, Args>($([< $route:snake _handler >]: F,),*) -> actix_web::Scope 
-                where
-                    F: Handler<Args>,
-                    Args: FromRequest + 'static,
-                    F::Output: Responder + 'static
-                {
-                        web::scope(Self::PATH)
-                        $( .route($route::PATH, $route::to_actix_route([< $route:snake _handler >])))*
-                }
-            }
-        }
-    }
 }
 
 to_actix_scope_macro!(Root);
