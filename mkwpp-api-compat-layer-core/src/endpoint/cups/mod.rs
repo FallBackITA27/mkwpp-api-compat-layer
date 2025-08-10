@@ -18,7 +18,7 @@ impl Endpoint for GetCups {
     const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
 
     type InputStruct = ();
-    type OutputStruct = GetCupsOutput;
+    type OutputStruct = Vec<GetCupsOutput>;
 
     type ScopeStruct = CupsScope;
 }
