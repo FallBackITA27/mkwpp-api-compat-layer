@@ -1,7 +1,10 @@
 use super::{from_input::InputFromActix, to_route::ToActixRoute};
-use crate::endpoint::{
-    Endpoint, Root, Scope,
-    cups::{CupsScope, GetCups},
+use crate::{
+    endpoint::{
+        Endpoint, Root, Scope,
+        cups::{CupsScope, GetCups},
+    },
+    error::FinalErrorResponse,
 };
 use actix_web::web;
 use paste::paste;
@@ -20,7 +23,7 @@ macro_rules! to_actix_scope_macro {
                 pub fn to_actix_scope(
                     $([< $route:snake _handler >]:
                         impl AsyncFn(<$route as Endpoint>::InputStruct)
-                            -> <$route as Endpoint>::OutputStruct + 'static
+                            -> Result<<$route as Endpoint>::OutputStruct, FinalErrorResponse> + 'static
                     ),*
                 ) -> actix_web::Scope
                     where

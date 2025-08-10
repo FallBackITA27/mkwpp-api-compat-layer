@@ -3,7 +3,7 @@ use crate::{request_method::RequestMethod, required_permission::RequiredPermissi
 pub mod cups;
 pub mod players;
 
-pub trait Endpoint {
+pub trait Endpoint: Default {
     const PATH: &'static str;
     const REQUEST_METHOD: RequestMethod;
     const REQUIRED_PERMISSION: RequiredPermission;

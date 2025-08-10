@@ -11,7 +11,9 @@ impl Scope for CupsScope {
     type OuterScope = Root;
 }
 
+#[derive(Default)]
 pub struct GetCups;
+
 impl Endpoint for GetCups {
     const PATH: &'static str = "/get";
     const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
