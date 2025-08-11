@@ -2,8 +2,8 @@ use actix_web::{HttpResponse, Route, web};
 
 use super::from_input::InputFromActix;
 use crate::{
-    endpoint::{cups::GetCups, tracks::GetTracks, Endpoint},
-    error::FinalErrorResponse,
+    endpoint::{Endpoint, cups::GetCups, tracks::GetTracks},
+    error::{FinalErrorResponse, PPResult},
 };
 
 pub trait ToActixRoute: Endpoint
@@ -13,8 +13,7 @@ where
 {
     /// Only call this once, please.
     fn to_actix_route(
-        handler: impl AsyncFn(Self::InputStruct) -> Result<Self::OutputStruct, FinalErrorResponse>
-        + 'static,
+        handler: impl AsyncFn(Self::InputStruct) -> PPResult<Self::OutputStruct> + 'static,
     ) -> Route {
         let handler = std::sync::Arc::new(handler);
 

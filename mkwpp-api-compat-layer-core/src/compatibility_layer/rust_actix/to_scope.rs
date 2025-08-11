@@ -3,9 +3,9 @@ use crate::{
     endpoint::{
         Endpoint, Root, Scope,
         cups::{CupsScope, GetCups},
-        tracks::{TracksScope,GetTracks}
+        tracks::{GetTracks, TracksScope},
     },
-    error::FinalErrorResponse,
+    error::PPResult,
 };
 use actix_web::web;
 use paste::paste;
@@ -24,7 +24,7 @@ macro_rules! to_actix_scope_macro {
                 pub fn to_actix_scope(
                     $([< $route:snake _handler >]:
                         impl AsyncFn(<$route as Endpoint>::InputStruct)
-                            -> Result<<$route as Endpoint>::OutputStruct, FinalErrorResponse> + 'static
+                            -> PPResult<<$route as Endpoint>::OutputStruct> + 'static
                     ),*
                 ) -> actix_web::Scope
                     where

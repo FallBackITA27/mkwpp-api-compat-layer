@@ -1,8 +1,8 @@
 use crate::{request_method::RequestMethod, required_permission::RequiredPermission};
 
 pub mod cups;
-pub mod tracks;
 pub mod players;
+pub mod tracks;
 
 pub trait Endpoint: Default {
     const PATH: &'static str;

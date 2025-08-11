@@ -1,5 +1,7 @@
 use crate::{
-    common_types::Category, endpoint::{Endpoint, RequiredPermission, Root, Scope}, request_method::RequestMethod
+    common_types::Category,
+    endpoint::{Endpoint, RequiredPermission, Root, Scope},
+    request_method::RequestMethod,
 };
 
 pub struct TracksScope;

@@ -1,5 +1,5 @@
 pub enum Category {
     Normal,
     Shortcut,
-    Unrestricted
+    Unrestricted,
 }

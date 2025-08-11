@@ -1,6 +1,5 @@
 use crate::common_types::Category;
 
-
 impl From<Category> for u8 {
     fn from(val: Category) -> Self {
         Self::from(&val)
