@@ -2,6 +2,8 @@ use std::collections::HashMap;
 
 use crate::status_code::StatusCode;
 
+pub type PPResult<T> = Result<T, FinalErrorResponse>;
+
 #[cfg_attr(feature = "rust-actix", derive(Debug, serde::Serialize))]
 pub struct FinalErrorResponse {
     #[cfg_attr(feature = "rust-actix", serde(skip))]
