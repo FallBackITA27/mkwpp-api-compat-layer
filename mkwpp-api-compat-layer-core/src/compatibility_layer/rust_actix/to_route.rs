@@ -16,13 +16,24 @@ impl<T: InputFromActix> InputFromActix for BasicInputs<T> {
         let token = request
             .headers()
             .get("Bearer-Token")
-            .map(|value| value.as_bytes().try_into().ok())
-            .flatten();
-        
+            .and_then(|value| value.as_bytes().try_into().ok());
+
         Self {
             inner: T::get_from_request(request),
             session_token_bytes: token,
         }
+    }
+}
+
+impl<T: InputFromActix> BasicInputs<T> {
+    pub fn get_inner(self) -> T {
+        self.inner
+    }
+
+    pub fn get_session_token(&self) -> Option<&str> {
+        self.session_token_bytes
+            .as_ref()
+            .and_then(|bytes| str::from_utf8(bytes).ok())
     }
 }
 
