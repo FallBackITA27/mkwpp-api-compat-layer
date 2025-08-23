@@ -1,4 +1,5 @@
 use crate::{
+    common_data_traits::DataHasId,
     common_types::Category,
     endpoint::{Endpoint, RequiredPermission, Root, Scope},
     request_method::RequestMethod,
@@ -32,4 +33,10 @@ pub struct GetTracksOutput {
     pub abbr: String,
     pub cup_id: i32,
     pub categories: Vec<Category>,
+}
+
+impl DataHasId for GetTracksOutput {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
 }

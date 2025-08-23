@@ -1,3 +1,4 @@
+pub mod common_data_traits;
 pub mod common_types;
 pub mod compatibility_layer;
 pub mod endpoint;

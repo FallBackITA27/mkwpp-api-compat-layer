@@ -1,4 +1,5 @@
 use crate::{
+    common_data_traits::DataHasId,
     endpoint::{Endpoint, RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };
@@ -30,4 +31,10 @@ pub struct GetCupsOutput {
     pub id: i32,
     pub code: &'static str,
     pub track_ids: [i32; 4],
+}
+
+impl DataHasId for GetCupsOutput {
+    fn get_id(&self) -> i32 {
+        self.id
+    }
 }
