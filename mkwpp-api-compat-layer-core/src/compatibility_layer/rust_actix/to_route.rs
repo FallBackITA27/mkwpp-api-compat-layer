@@ -11,6 +11,15 @@ pub struct BasicInputs<T: InputFromActix> {
     session_token_bytes: Option<[u8; 128]>,
 }
 
+impl<T: Default + InputFromActix> Default for BasicInputs<T> {
+    fn default() -> Self {
+        Self {
+            inner: T::default(),
+            session_token_bytes: None,
+        }
+    }
+}
+
 impl<T: InputFromActix> InputFromActix for BasicInputs<T> {
     fn get_from_request(request: HttpRequest) -> Self {
         let token = request
