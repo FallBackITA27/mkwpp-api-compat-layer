@@ -26,8 +26,8 @@ impl<T: InputFromActix> InputFromActix for BasicInputs<T> {
 }
 
 impl<T: InputFromActix> BasicInputs<T> {
-    pub fn get_inner(self) -> T {
-        self.inner
+    pub fn get_inner(&mut self) -> &mut T {
+        &mut self.inner
     }
 
     pub fn get_session_token(&self) -> Option<&str> {
