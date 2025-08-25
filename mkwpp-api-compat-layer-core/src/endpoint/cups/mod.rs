@@ -1,7 +1,5 @@
 use crate::{
-    common_data_traits::DataHasId,
-    endpoint::{Endpoint, RequiredPermission, Root, Scope},
-    request_method::RequestMethod,
+    common_data_traits::GetId, endpoint::{Endpoint, RequiredPermission, Root, Scope}, request_method::RequestMethod
 };
 
 pub struct CupsScope;
@@ -33,7 +31,8 @@ pub struct GetCupsOutput {
     pub track_ids: [i32; 4],
 }
 
-impl DataHasId for GetCupsOutput {
+impl GetId for GetCupsOutput {
+    const HAS_ID: bool = true;
     fn get_id(&self) -> i32 {
         self.id
     }

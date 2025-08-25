@@ -1,6 +1,6 @@
 use super::{
     from_input::InputFromActix,
-    to_route::{BasicInputs, ToActixRoute},
+    to_route::ToActixRoute,
 };
 use crate::{
     endpoint::{
@@ -26,7 +26,7 @@ macro_rules! to_actix_scope_macro {
             paste! {
                 pub fn to_actix_scope(
                     $([< $route:snake _handler >]:
-                        impl AsyncFn(BasicInputs<<$route as Endpoint>::InputStruct>)
+                        impl AsyncFn(<$route as Endpoint>::InputStruct)
                             -> PPResult<<$route as Endpoint>::OutputStruct> + 'static
                     ),*
                 ) -> actix_web::Scope

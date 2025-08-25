@@ -5,17 +5,29 @@ edition = "2024"
 
 [dependencies]
 actix-web = { version = "4.11.0", optional = true }
+js-sys = { version = "0.3.77", optional = true }
 paste = "1.0.15"
 serde = { version = "1.0.219", features = ["derive"] }
+serde-wasm-bindgen = { version = "0.6.5", optional = true }
 serde_json = "1.0.142"
+wasm-bindgen = { version = "0.2.100", optional = true }
+wasm-bindgen-futures = { version = "0.4.50", optional = true }
+web-sys = { version = "0.3.77", optional = true, features = [
+  'Headers',
+  'Request',
+  'RequestInit',
+  'RequestMode',
+  'Response',
+  'Window',
+] }
 
 [dev-dependencies]
-strum = { version = "*",features = ["derive"] }
+strum = { version = "*", features = ["derive"] }
 
 [features]
 default = ["rust-actix"]
 rust-actix = ["dep:actix-web"]
+typescript-wasm = ["dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:js-sys", "dep:web-sys", "dep:serde-wasm-bindgen"]
 
 [lints]
 workspace = true
-

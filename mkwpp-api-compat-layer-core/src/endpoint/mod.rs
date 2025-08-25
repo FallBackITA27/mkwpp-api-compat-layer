@@ -1,4 +1,4 @@
-use crate::{request_method::RequestMethod, required_permission::RequiredPermission};
+use crate::{common_data_traits::DataTraits, request_method::RequestMethod, required_permission::RequiredPermission};
 
 pub mod cups;
 pub mod players;
@@ -9,7 +9,7 @@ pub trait Endpoint: Default {
     const REQUEST_METHOD: RequestMethod;
     const REQUIRED_PERMISSION: RequiredPermission;
 
-    type InputStruct;
+    type InputStruct: DataTraits;
     type OutputStruct;
 
     type ScopeStruct: Scope;

@@ -1,8 +1,5 @@
 use crate::{
-    common_data_traits::DataHasId,
-    common_types::Category,
-    endpoint::{Endpoint, RequiredPermission, Root, Scope},
-    request_method::RequestMethod,
+    common_data_traits::GetId, common_types::Category, endpoint::{Endpoint, RequiredPermission, Root, Scope}, request_method::RequestMethod
 };
 
 pub struct TracksScope;
@@ -35,8 +32,9 @@ pub struct GetTracksOutput {
     pub categories: Vec<Category>,
 }
 
-impl DataHasId for GetTracksOutput {
+impl GetId for GetTracksOutput {
+    const HAS_ID: bool = true;
     fn get_id(&self) -> i32 {
         self.id
-    }
+    } 
 }
