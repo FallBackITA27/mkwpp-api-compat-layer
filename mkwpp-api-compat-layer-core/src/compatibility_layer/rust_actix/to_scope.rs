@@ -1,7 +1,4 @@
-use super::{
-    from_input::InputFromActix,
-    to_route::ToActixRoute,
-};
+use super::{from_input::InputFromActix, to_route::ToActixRoute};
 use crate::{
     endpoint::{
         Endpoint, Root, Scope,

@@ -1,3 +1,4 @@
+#[cfg_attr(feature = "typescript-wasm", derive(PartialEq))]
 pub enum RequestMethod {
     Get,
     Head,

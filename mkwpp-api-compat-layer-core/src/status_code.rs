@@ -1,5 +1,10 @@
 #[cfg_attr(all(feature = "rust-actix", test), derive(strum::EnumIter))]
-#[cfg_attr(feature = "rust-actix", derive(Clone, Copy, Debug))]
+#[cfg_attr(feature = "rust-actix", derive(Debug))]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[cfg_attr(
+    any(feature = "typescript-wasm", feature = "rust-actix"),
+    derive(serde::Deserialize, serde::Serialize, Clone, Copy)
+)]
 pub enum StatusCode {
     Continue,
     SwitchingProtocols,

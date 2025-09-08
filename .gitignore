@@ -3,3 +3,9 @@
 
 /target
 Cargo.lock
+
+# WASM
+**/*.rs.bk
+bin/
+pkg/
+wasm-pack.log

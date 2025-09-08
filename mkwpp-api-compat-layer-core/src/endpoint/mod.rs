@@ -1,4 +1,7 @@
-use crate::{common_data_traits::DataTraits, request_method::RequestMethod, required_permission::RequiredPermission};
+use crate::{
+    common_data_traits::DataTraits, request_method::RequestMethod,
+    required_permission::RequiredPermission,
+};
 
 pub mod cups;
 pub mod players;
@@ -13,6 +16,10 @@ pub trait Endpoint: Default {
     type OutputStruct;
 
     type ScopeStruct: Scope;
+
+    fn construct_full_path() -> String {
+        Self::ScopeStruct::construct_full_path() + Self::PATH
+    }
 }
 
 pub trait Scope {

@@ -1,34 +1,90 @@
-use std::collections::HashMap;
-
 use crate::status_code::StatusCode;
 
 pub type PPResult<T> = Result<T, FinalErrorResponse>;
 
-#[cfg_attr(feature = "rust-actix", derive(Debug, serde::Serialize))]
+#[cfg_attr(feature = "rust-actix", derive(serde::Serialize, Debug))]
 pub struct FinalErrorResponse {
-    #[cfg_attr(feature = "rust-actix", serde(skip))]
     pub status_code: StatusCode,
-    pub error_code: u64,
-    pub non_field_errors: Vec<String>,
-    pub field_errors: std::collections::HashMap<String, Vec<String>>,
+    pub errors: Vec<FinalError>,
 }
 
 impl FinalErrorResponse {
-    pub fn new(
-        error_code: u64,
-        status_code: StatusCode,
-        non_field_errors: Vec<String>,
-        field_errors: std::collections::HashMap<String, Vec<String>>,
-    ) -> Self {
+    #[inline]
+    pub fn new(status_code: StatusCode, errors: Vec<FinalError>) -> FinalErrorResponse {
         FinalErrorResponse {
             status_code,
-            error_code,
-            non_field_errors,
-            field_errors,
+            errors,
         }
+    }
+
+    #[inline]
+    pub fn new_from_final_error(status_code: StatusCode, error: FinalError) -> FinalErrorResponse {
+        FinalErrorResponse {
+            status_code,
+            errors: vec![error],
+        }
+    }
+
+    #[inline]
+    pub fn push(&mut self, error: FinalError) {
+        self.errors.push(error);
     }
 }
 
+#[cfg_attr(feature = "rust-actix", derive(Debug))]
+#[cfg_attr(
+    any(feature = "typescript-wasm", feature = "rust-actix"),
+    derive(serde::Serialize)
+)]
+pub struct FinalError {
+    pub error_code: u64,
+
+    pub field: Option<&'static str>,
+    pub error_text: &'static str,
+
+    pub library_error: Option<String>,
+
+    pub backend_file: &'static str,
+    pub backend_line: u32,
+}
+
+impl FinalError {
+    fn new(
+        error_code: u64,
+        field: Option<&'static str>,
+        error_text: &'static str,
+        library_error: Option<impl ToString>,
+        backend_file: &'static str,
+        backend_line: u32,
+    ) -> Self {
+        Self {
+            error_code,
+            field,
+            error_text,
+            backend_file,
+            backend_line,
+            library_error: library_error.map(|r| r.to_string()),
+        }
+    }
+
+    #[inline]
+    pub fn into_response(self, status_code: StatusCode) -> FinalErrorResponse {
+        FinalErrorResponse::new_from_final_error(status_code, self)
+    }
+}
+
+#[macro_export]
+macro_rules! new_final_error {
+    ($error_code: path) => {
+        ErrorCodes::into_final_error($error_code, None, file!(), line!())
+    };
+
+    ($error_code: path, $impl_to_str: tt) => {
+        ErrorCodes::into_final_error($error_code, Some($impl_to_str), file!(), line!())
+    };
+}
+
+#[derive(Clone, Copy)]
 pub enum ErrorCodes {
     NoConnectionFromPGPool,
     SerializingDataToJSON,
@@ -116,277 +172,68 @@ impl From<ErrorCodes> for u64 {
 }
 
 impl ErrorCodes {
-    pub fn into_final_error(self, library_error: impl ToString) -> FinalErrorResponse {
-        let mut out = match self {
-            Self::NoConnectionFromPGPool => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Couldn't get connection from data pool")],
-                HashMap::new(),
-            ),
-            Self::SerializingDataToJSON => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error serializing data to JSON")],
-                HashMap::new(),
-            ),
-            Self::ClosingConnectionFromPGPool => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error closing Database connection")],
-                HashMap::new(),
-            ),
-            Self::GettingFromDatabase => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Couldn't get rows from database")],
-                HashMap::new(),
-            ),
-            Self::DecodingDatabaseRows => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error decoding database rows")],
-                HashMap::new(),
-            ),
-            Self::UserIdToPlayerId => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error converting User ID to Player ID")],
-                HashMap::new(),
-            ),
-            Self::GenerateTimesheet => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error generating timesheet")],
-                HashMap::new(),
-            ),
-            Self::GenerateMatchup => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error generating matchup")],
-                HashMap::new(),
-            ),
-
-            Self::UsernameTooShort => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the username")],
-                std::collections::HashMap::from([(
-                    String::from("username"),
-                    vec![String::from("Username too short")],
-                )]),
-            ),
-            Self::UsernameTooLong => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the username")],
-                std::collections::HashMap::from([(
-                    String::from("username"),
-                    vec![String::from("Username too long")],
-                )]),
-            ),
-            Self::PasswordTooLong => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password too long")],
-                )]),
-            ),
-            Self::PasswordTooShort => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password too short")],
-                )]),
-            ),
-            Self::PasswordMustHaveSpecial => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password must have a special character")],
-                )]),
-            ),
-            Self::PasswordMustHaveLowercase => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password must have a lowercase character")],
-                )]),
-            ),
-            Self::PasswordMustHaveUppercase => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password must have an uppercase character")],
-                )]),
-            ),
-            Self::PasswordMustHaveNumber => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the password")],
-                std::collections::HashMap::from([(
-                    String::from("password"),
-                    vec![String::from("Password must have a number")],
-                )]),
-            ),
-            Self::EmailTooLong => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the email")],
-                std::collections::HashMap::from([(
-                    String::from("email"),
-                    vec![String::from("Email too long")],
-                )]),
-            ),
-            Self::EmailInvalid => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Error validating the email")],
-                std::collections::HashMap::from([(
-                    String::from("email"),
-                    vec![String::from("Email invalid")],
-                )]),
-            ),
-            Self::UserIDDoesntExist => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error getting user ID")],
-                HashMap::new(),
-            ),
-
-            Self::InvalidSessionToken => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::Forbidden,
-                vec![String::from("Invalid session token")],
-                HashMap::new(),
-            ),
-            Self::UserHasNoAssociatedPlayer => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("User has no associated player")],
-                HashMap::new(),
-            ),
-            Self::CreatePGTransaction => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error creating postgres transaction")],
-                HashMap::new(),
-            ),
-            Self::CommitPGTransaction => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error committing postgres transaction")],
-                HashMap::new(),
-            ),
-            Self::InsufficientPermissions => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::Forbidden,
-                vec![String::from("Insufficient Permissions")],
-                HashMap::new(),
-            ),
-            Self::GeneratingToken => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error generating token")],
-                HashMap::new(),
-            ),
-            Self::MismatchedIds => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Mismatched IDs")],
-                HashMap::new(),
-            ),
-            Self::NothingChanged => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Nothing to update")],
-                HashMap::new(),
-            ),
-            Self::InvalidInput => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Input is invalid")],
-                HashMap::new(),
-            ),
-            Self::TechnicallyUnreachableCode => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from(
-                    "Technically unreachable code has been reached",
-                )],
-                HashMap::new(),
-            ),
-            Self::CreatingEmailClient => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("There was an error creating the email client")],
-                HashMap::new(),
-            ),
-            Self::SendingEmail => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("There was an error sending the email")],
-                HashMap::new(),
-            ),
-            Self::UserNotVerified => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("User is not verified")],
-                HashMap::new(),
-            ),
-            Self::UserOnCooldown => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("User is on cooldown")],
-                HashMap::new(),
-            ),
-            Self::NoAssociatedPlayer => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("There is no associated player")],
-                HashMap::new(),
-            ),
-            Self::InvalidChadsoftID => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::BadRequest,
-                vec![String::from("Chadsoft ID is not valid")],
-                HashMap::new(),
-            ),
-            Self::NoDataToSerialize => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Whoever coded this is a moron")],
-                HashMap::new(),
-            ),
-            Self::CannotReadFile => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Could not read file")],
-                HashMap::new(),
-            ),
-            Self::RollBackPGTransaction => FinalErrorResponse::new(
-                self.into(),
-                StatusCode::InternalServerError,
-                vec![String::from("Error rolling back postgres transaction")],
-                HashMap::new(),
-            ),
+    pub fn into_final_error(
+        self,
+        library_error: Option<impl ToString>,
+        backend_file: &'static str,
+        backend_line: u32,
+    ) -> FinalError {
+        let (field, error_text) = match self {
+            Self::NoConnectionFromPGPool => (None, "Couldn't get connection from data pool"),
+            Self::SerializingDataToJSON => (None, "Error serializing data to JSON"),
+            Self::ClosingConnectionFromPGPool => (None, "Error closing Database connection"),
+            Self::GettingFromDatabase => (None, "Couldn't get rows from database"),
+            Self::DecodingDatabaseRows => (None, "Error decoding database rows"),
+            Self::UserIdToPlayerId => (None, "Error converting User ID to Player ID"),
+            Self::GenerateTimesheet => (None, "Error generating timesheet"),
+            Self::GenerateMatchup => (None, "Error generating matchup"),
+            Self::UsernameTooShort => (Some("username"), "Username too short"),
+            Self::UsernameTooLong => (Some("username"), "Username too long"),
+            Self::PasswordTooLong => (Some("password"), "Password too long"),
+            Self::PasswordTooShort => (Some("password"), "Password too short"),
+            Self::PasswordMustHaveSpecial => {
+                (Some("password"), "Password must have a special character")
+            }
+            Self::PasswordMustHaveLowercase => {
+                (Some("password"), "Password must have a lowercase character")
+            }
+            Self::PasswordMustHaveUppercase => {
+                (Some("password"), "Password must have a uppercase character")
+            }
+            Self::PasswordMustHaveNumber => (Some("password"), "Password must have a number"),
+            Self::EmailTooLong => (Some("email"), "Email too long"),
+            Self::EmailInvalid => (Some("email"), "Email invalid"),
+            Self::UserIDDoesntExist => (None, "Error getting user ID"),
+            Self::InvalidSessionToken => (None, "Invalid session token"),
+            Self::UserHasNoAssociatedPlayer => (None, "User has no associated player profile"),
+            Self::CreatePGTransaction => (None, "Error creating postgres transaction"),
+            Self::CommitPGTransaction => (None, "Error committing postgres transaction"),
+            Self::InsufficientPermissions => (None, "Insufficient permissions"),
+            Self::GeneratingToken => (None, "Error generating token"),
+            Self::MismatchedIds => (None, "Mismatched IDs"),
+            Self::NothingChanged => (None, "Nothing to update"),
+            Self::InvalidInput => (None, "Input is invalid"),
+            Self::TechnicallyUnreachableCode => {
+                (None, "Technically unreachable code has been reached")
+            }
+            Self::CreatingEmailClient => (None, "There was an error creating the email client"),
+            Self::SendingEmail => (None, "There was an error sending the email"),
+            Self::UserNotVerified => (None, "User is not verified"),
+            Self::UserOnCooldown => (None, "User is on cooldown"),
+            Self::NoAssociatedPlayer => (None, "There is no associated player"),
+            Self::InvalidChadsoftID => (None, "Chadsoft ID is not valid"),
+            Self::NoDataToSerialize => (None, "Whoever coded this is a moron"),
+            Self::CannotReadFile => (None, "Could not read file"),
+            Self::RollBackPGTransaction => (None, "Error rolling back postgres transaction"),
         };
 
-        let library_error = library_error.to_string();
-        if !library_error.is_empty() {
-            out.non_field_errors.push(library_error);
-        }
-
-        out
+        FinalError::new(
+            self.into(),
+            field,
+            error_text,
+            library_error,
+            backend_file,
+            backend_line,
+        )
     }
 }

@@ -2,7 +2,7 @@ use actix_web::{HttpRequest, HttpResponse, Route, web};
 
 use super::from_input::InputFromActix;
 use crate::{
-    endpoint::{Endpoint, cups::GetCups, tracks::GetTracks},
+    endpoint::Endpoint,
     error::{FinalErrorResponse, PPResult},
 };
 
@@ -30,5 +30,10 @@ where
     }
 }
 
-impl ToActixRoute for GetCups {}
-impl ToActixRoute for GetTracks {}
+impl<T> ToActixRoute for T
+where
+    T: Endpoint,
+    T::InputStruct: InputFromActix,
+    T::OutputStruct: serde::Serialize,
+{
+}

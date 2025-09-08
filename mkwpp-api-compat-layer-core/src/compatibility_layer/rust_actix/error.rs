@@ -28,11 +28,8 @@ impl std::fmt::Display for FinalErrorResponse {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         write!(
             f,
-            "FinalErrorResponse: {{ error_code: {}, status_code: {}, non_field_errors: {:?}, field_errors: {:?} }}",
-            self.error_code,
-            self.status_code.to_number(),
-            self.non_field_errors,
-            self.field_errors
+            "FinalErrorResponse: {{ errors: {:?}, status_code: {:?} }}",
+            self.errors, self.status_code
         )
     }
 }

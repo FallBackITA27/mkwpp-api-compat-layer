@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["mkwpp-api-compat-layer-core"]
+members = ["mkwpp-api-compat-layer-core", "mkwpp-api-compat-layer-wasm"]
 
 [workspace.lints.clippy]
 duplicate_mod = "deny"

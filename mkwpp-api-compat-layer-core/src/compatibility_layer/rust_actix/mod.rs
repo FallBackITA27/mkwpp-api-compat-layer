@@ -2,7 +2,6 @@ use actix_web::http;
 
 use crate::request_method::RequestMethod;
 
-pub mod common_types;
 pub mod error;
 pub mod from_input;
 pub mod to_route;
