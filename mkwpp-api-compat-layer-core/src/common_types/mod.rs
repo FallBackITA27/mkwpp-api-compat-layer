@@ -1,6 +1,7 @@
 use serde::de::Visitor;
 
 pub mod players;
+pub mod rankings;
 pub mod regions;
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]

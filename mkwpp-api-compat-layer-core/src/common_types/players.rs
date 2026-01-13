@@ -1,7 +1,9 @@
 use wasm_bindgen::prelude::wasm_bindgen;
 
-use crate::{common_data_traits::{GetCategory, GetSessionToken, HasId}, common_types::{ChadsoftID, UtcTimestamp}};
-
+use crate::{
+    common_data_traits::{GetCategory, GetSessionToken, HasId},
+    common_types::{ChadsoftID, UtcTimestamp},
+};
 
 #[either_field::make_template(
     GenStructs: true,

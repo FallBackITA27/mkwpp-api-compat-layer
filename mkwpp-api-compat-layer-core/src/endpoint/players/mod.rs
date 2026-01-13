@@ -1,4 +1,13 @@
-use crate::{common_data_traits::{GetCategory, GetId, GetSessionToken}, common_types::{NoData, players::{Players, PlayersBasic}}, endpoint::{Endpoint, Root, Scope}, request_method::RequestMethod, required_permission::RequiredPermission};
+use crate::{
+    common_data_traits::{GetCategory, GetId, GetSessionToken},
+    common_types::{
+        NoData,
+        players::{Players, PlayersBasic},
+    },
+    endpoint::{Endpoint, Root, Scope},
+    request_method::RequestMethod,
+    required_permission::RequiredPermission,
+};
 
 pub struct PlayersScope;
 impl Scope for PlayersScope {
@@ -11,9 +20,9 @@ impl Scope for PlayersScope {
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct GetPlayers;
 
-impl Endpoint for GetPlayers{
+impl Endpoint for GetPlayers {
     const PATH: &'static str = "/get";
-    const REQUEST_METHOD: RequestMethod= RequestMethod::Get;
+    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
     const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
 
     type InputStruct = GetPlayersInput;
@@ -23,7 +32,7 @@ impl Endpoint for GetPlayers{
 }
 
 struct GetPlayersInput {
-    basic: bool
+    basic: bool,
 }
 impl GetId for GetPlayersInput {}
 impl GetCategory for GetPlayersInput {}
@@ -42,9 +51,9 @@ enum GetPlayersOutput {
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct GetList;
 
-impl Endpoint for GetList{
+impl Endpoint for GetList {
     const PATH: &'static str = "/list";
-    const REQUEST_METHOD: RequestMethod= RequestMethod::Get;
+    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
     const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
 
     type InputStruct = NoData;
