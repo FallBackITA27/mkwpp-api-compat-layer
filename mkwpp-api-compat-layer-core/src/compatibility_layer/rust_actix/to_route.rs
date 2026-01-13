@@ -17,10 +17,10 @@ where
     ) -> Route {
         let handler = std::sync::Arc::new(handler);
 
-        let inner_handler = move |req: HttpRequest| {
+        let inner_handler = move |mut req: HttpRequest| {
             let handler = handler.clone();
             async move {
-                let input = Self::InputStruct::get_from_request(req);
+                let input = Self::InputStruct::get_from_request(&mut req);
                 let data = handler(input).await?;
                 Ok::<HttpResponse, FinalErrorResponse>(HttpResponse::Ok().json(data))
             }

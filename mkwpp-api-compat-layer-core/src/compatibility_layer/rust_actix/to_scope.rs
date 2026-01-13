@@ -2,7 +2,13 @@ use super::{from_input::InputFromActix, to_route::ToActixRoute};
 use crate::{
     endpoint::{
         Endpoint, Root, Scope,
+        champs::{ChampsScope, GetChamps},
         cups::{CupsScope, GetCups},
+        regions::{
+            GetRegionsAncestors, GetRegionsDescendants, GetRegionsWithPlayerCount, RegionsScope,
+        },
+        standard_levels::{GetStandardLevels, StandardLevelsScope},
+        standards::{GetStandards, StandardsScope},
         tracks::{GetTracks, TracksScope},
     },
     error::PPResult,
@@ -48,3 +54,7 @@ macro_rules! to_actix_scope_macro {
 to_actix_scope_macro!(Root);
 to_actix_scope_macro!(CupsScope; GetCups);
 to_actix_scope_macro!(TracksScope; GetTracks);
+to_actix_scope_macro!(StandardsScope; GetStandards);
+to_actix_scope_macro!(StandardLevelsScope; GetStandardLevels);
+to_actix_scope_macro!(ChampsScope; GetChamps);
+to_actix_scope_macro!(RegionsScope; GetRegionsWithPlayerCount, GetRegionsAncestors, GetRegionsDescendants);

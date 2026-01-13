@@ -3,8 +3,13 @@ use crate::{
     required_permission::RequiredPermission,
 };
 
+pub mod blog;
+pub mod champs;
 pub mod cups;
 pub mod players;
+pub mod regions;
+pub mod standard_levels;
+pub mod standards;
 pub mod tracks;
 
 pub trait Endpoint: Default {

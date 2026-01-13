@@ -1,8 +1,8 @@
-use crate::common_types::NoData;
+use crate::common_types::{Category, NoData};
 
 /// Marker Type
-pub trait DataTraits: GetId + GetSessionToken {}
-impl<T> DataTraits for T where T: GetId + GetSessionToken {}
+pub trait DataTraits: GetId + GetSessionToken + GetCategory {}
+impl<T> DataTraits for T where T: GetId + GetSessionToken + GetCategory {}
 
 // Item ID
 pub trait HasId {
@@ -27,7 +27,6 @@ where
 }
 
 // Item session Token
-
 pub trait HasSessionToken {
     fn get_token(&self) -> &str;
 }
@@ -49,7 +48,29 @@ where
     }
 }
 
-// The NoData impls below here
+/// Item category
+pub trait HasCategory {
+    fn get_category(&self) -> Category;
+}
 
+pub trait GetCategory {
+    const HAS_CATEGORY: bool = false;
+    fn get_category(&self) -> Category {
+        Category::Normal
+    }
+}
+
+impl<T> GetCategory for T
+where
+    T: HasCategory,
+{
+    const HAS_CATEGORY: bool = true;
+    fn get_category(&self) -> Category {
+        HasCategory::get_category(self)
+    }
+}
+
+// NoData impls
 impl GetId for NoData {}
 impl GetSessionToken for NoData {}
+impl GetCategory for NoData {}

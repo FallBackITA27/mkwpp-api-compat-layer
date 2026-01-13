@@ -1,4 +1,3 @@
-
 use futures::TryFutureExt;
 use serde::de::DeserializeOwned;
 use wasm_bindgen::JsValue;
@@ -7,15 +6,16 @@ use web_sys::RequestInit;
 
 use crate::{
     common_data_traits::GetSessionToken,
-    endpoint::Endpoint,
-    error::ErrorCodes,
-    new_final_error,
-    request_method::RequestMethod,
+    compatibility_layer::typescript_wasm::into_input::InputToRequest, endpoint::Endpoint,
+    error::ErrorCodes, new_final_error, request_method::RequestMethod,
 };
+
+mod into_input;
 
 pub trait Fetchable: Endpoint
 where
     Self::OutputStruct: DeserializeOwned,
+    Self::InputStruct: InputToRequest,
 {
     #[allow(async_fn_in_trait)]
     async fn fetch(
@@ -35,12 +35,22 @@ where
             headers.append("Content-Type", "application/json")?;
         }
 
+        let fetch_data = inputs.to_input();
+
         request.set_headers(&headers);
+
+        if let Some(v) = fetch_data.body {
+            let body = serde_wasm_bindgen::to_value(&v).expect("Couldn't turn value to JsValue");
+            request.set_body(&body);
+        }
 
         JsFuture::from(
             web_sys::window()
                 .expect("Couldn't access window")
-                .fetch_with_str_and_init(Self::construct_full_path().as_str(), &request),
+                .fetch_with_str_and_init(
+                    (Self::construct_full_path() + fetch_data.query_string.as_str()).as_str(),
+                    &request,
+                ),
         )
         .map_ok(|ok_val| {
             serde_wasm_bindgen::from_value::<<Self as Endpoint>::OutputStruct>(ok_val).map_err(
@@ -62,5 +72,6 @@ impl<T> Fetchable for T
 where
     T: Endpoint,
     T::OutputStruct: DeserializeOwned,
+    T::InputStruct: InputToRequest,
 {
 }
