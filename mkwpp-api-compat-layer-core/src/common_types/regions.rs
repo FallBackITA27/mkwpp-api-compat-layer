@@ -1,3 +1,5 @@
+use serde::de::Visitor;
+
 use crate::common_data_traits::HasId;
 
 #[either_field::make_template(

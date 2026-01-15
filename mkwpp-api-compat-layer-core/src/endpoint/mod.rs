@@ -7,6 +7,7 @@ pub mod blog;
 pub mod champs;
 pub mod cups;
 pub mod players;
+pub mod rankings;
 pub mod regions;
 pub mod standard_levels;
 pub mod standards;

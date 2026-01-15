@@ -1,6 +1,6 @@
 #[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-struct AverageFinish(f64);
+pub struct AverageFinish(f64);
 impl From<f64> for AverageFinish {
     fn from(value: f64) -> Self {
         Self(value)
@@ -14,7 +14,7 @@ impl From<AverageFinish> for f64 {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-struct AverageRankRating(f64);
+pub struct AverageRankRating(f64);
 impl From<f64> for AverageRankRating {
     fn from(value: f64) -> Self {
         Self(value)
@@ -28,7 +28,7 @@ impl From<AverageRankRating> for f64 {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-struct PersonalRecordWorldRecord(f64);
+pub struct PersonalRecordWorldRecord(f64);
 impl From<f64> for PersonalRecordWorldRecord {
     fn from(value: f64) -> Self {
         Self(value)
@@ -42,7 +42,7 @@ impl From<PersonalRecordWorldRecord> for f64 {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-struct TallyPoints(i16);
+pub struct TallyPoints(i16);
 impl From<i16> for TallyPoints {
     fn from(value: i16) -> Self {
         Self(value)
@@ -56,7 +56,7 @@ impl From<TallyPoints> for i16 {
 
 #[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-struct TotalTime(i32);
+pub struct TotalTime(i32);
 impl From<i32> for TotalTime {
     fn from(value: i32) -> Self {
         Self(value)

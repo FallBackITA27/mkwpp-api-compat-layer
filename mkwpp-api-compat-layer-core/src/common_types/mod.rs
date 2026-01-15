@@ -88,7 +88,7 @@ impl From<i32> for Filter {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
+#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct UtcTimestamp(f64);
 
@@ -113,7 +113,7 @@ impl serde::Serialize for ChadsoftID {
     where
         S: serde::Serializer,
     {
-        serializer.serialize_str(format!("{:016X}", self.0))
+        serializer.serialize_str(&format!("{:016X}", self.0))
     }
 }
 
@@ -126,7 +126,7 @@ impl<'de> serde::Deserialize<'de> for ChadsoftID {
         impl<'de> Visitor<'de> for ChadsoftIDVisitor {
             type Value = ChadsoftID;
             fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
-                write!(formatter, "an integer between 0 and 2")
+                write!(formatter, "An i64 or Hex String")
             }
 
             fn visit_str<E>(self, v: &str) -> Result<Self::Value, E>
@@ -134,8 +134,8 @@ impl<'de> serde::Deserialize<'de> for ChadsoftID {
                 E: serde::de::Error,
             {
                 let v = u64::from_str_radix(v, 16)
-                    .map_err(|_| serde::de::Error::custom("Could not convert timestamp to date"))?;
-                Ok(v as i64)
+                    .map_err(|_| serde::de::Error::custom("Could not convert to chadsoft id"))?;
+                Ok(ChadsoftID(v as i64))
             }
 
             fn visit_i64<E>(self, v: i64) -> Result<Self::Value, E>
@@ -144,6 +144,11 @@ impl<'de> serde::Deserialize<'de> for ChadsoftID {
             {
                 Ok(ChadsoftID(v))
             }
+        }
+
+        match deserializer.is_human_readable() {
+            true => deserializer.deserialize_str(ChadsoftIDVisitor),
+            false => deserializer.deserialize_i64(ChadsoftIDVisitor),
         }
     }
 }
