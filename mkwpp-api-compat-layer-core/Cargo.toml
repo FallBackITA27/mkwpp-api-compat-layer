@@ -5,7 +5,7 @@ edition = "2024"
 
 [dependencies]
 actix-web = { version = "4.11.0", optional = true }
-either_field = "1.2.0"
+either_field = "1.2.1"
 futures = "0.3.31"
 js-sys = { version = "0.3.77", optional = true }
 paste = "1.0.15"
@@ -29,7 +29,7 @@ web-sys = { version = "0.3.77", optional = true, features = [
 strum = { version = "*", features = ["derive"] }
 
 [features]
-default = ["rust-actix", "wasm-bindgen"]
+default = ["rust-actix", "typescript-wasm"]
 rust-actix = ["dep:actix-web"]
 typescript-wasm = ["dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:js-sys", "dep:web-sys", "dep:serde-wasm-bindgen"]
 
