@@ -1,11 +1,13 @@
 use serde::de::Visitor;
 
+pub mod limit;
 pub mod players;
 pub mod rankings;
 pub mod regions;
+pub mod scores;
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 pub enum Category {
     Normal,
     Shortcut,
@@ -72,19 +74,71 @@ impl<'de> serde::Deserialize<'de> for Category {
     }
 }
 
-#[derive(serde::Serialize, serde::Deserialize, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-pub struct Filter(i32);
+#[derive(Debug, Clone, Copy)]
+pub enum LapMode {
+    Course,
+    FastLap,
+    Overall,
+}
 
-impl From<Filter> for i32 {
-    fn from(value: Filter) -> Self {
-        value.0
+impl TryInto<LapMode> for u8 {
+    type Error = ();
+    fn try_into(self) -> Result<LapMode, Self::Error> {
+        match self {
+            0 => Ok(LapMode::Course),
+            1 => Ok(LapMode::FastLap),
+            2 => Ok(LapMode::Overall),
+            3..=255 => Err(()),
+        }
     }
 }
 
-impl From<i32> for Filter {
-    fn from(value: i32) -> Self {
-        Self(value)
+impl From<LapMode> for u8 {
+    fn from(val: LapMode) -> Self {
+        match val {
+            LapMode::Course => 0,
+            LapMode::FastLap => 1,
+            LapMode::Overall => 2,
+        }
+    }
+}
+
+impl serde::Serialize for LapMode {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_u8((*self).into())
+    }
+}
+
+impl<'de> serde::Deserialize<'de> for LapMode {
+    fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de>,
+    {
+        struct LapModeVisitor;
+        impl<'de> Visitor<'de> for LapModeVisitor {
+            type Value = LapMode;
+            fn expecting(&self, formatter: &mut std::fmt::Formatter) -> std::fmt::Result {
+                write!(formatter, "an integer between 0 and 2")
+            }
+
+            fn visit_u8<E>(self, v: u8) -> Result<Self::Value, E>
+            where
+                E: serde::de::Error,
+            {
+                v.try_into().map_err(|_| {
+                    serde::de::Error::invalid_value(
+                        serde::de::Unexpected::Unsigned(v as u64),
+                        &self,
+                    )
+                })
+            }
+        }
+
+        deserializer.deserialize_u8(LapModeVisitor)
     }
 }
 

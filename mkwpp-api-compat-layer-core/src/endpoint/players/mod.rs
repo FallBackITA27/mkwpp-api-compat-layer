@@ -22,6 +22,7 @@ pub struct GetPlayers;
 #[derive(GetId, GetSessionToken, GetCategory)]
 pub struct GetPlayersInput {
     basic: bool,
+    ids: Vec<i32>,
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]

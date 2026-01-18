@@ -1,5 +1,6 @@
 use crate::{
     common_types::{
+        Category, LapMode,
         players::PlayersBasic,
         rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,
@@ -10,6 +11,7 @@ use crate::{
     required_permission::RequiredPermission,
 };
 
+use actix_web::cookie::time::UtcOffset;
 use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 pub struct RankingsScope;
@@ -28,7 +30,7 @@ macro_rules! rankings_type {
     ($type: ty, $endpoint: literal, $struct_name: ident, $output_struct_name: ident) => {
         #[derive(Default, Endpoint)]
         #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-        #[internal(path = $endpoint, output = Vec<$output_struct_name>, scope = RankingsScope)]
+        #[internal(path = $endpoint, input = RankingsInput, output = Vec<$output_struct_name>, scope = RankingsScope)]
         pub struct $struct_name;
 
         #[derive(GetId, GetCategory, GetSessionToken)]
@@ -40,8 +42,29 @@ macro_rules! rankings_type {
     };
 }
 
+#[derive(GetId, GetCategory, GetSessionToken)]
+pub struct RankingsInput {
+    #[internal(category)]
+    pub category: Category,
+    pub lap_mode: LapMode,
+    pub date: UtcOffset,
+    pub region_id: i32,
+}
+
 rankings_type!(AverageFinish);
 rankings_type!(TotalTime);
 rankings_type!(TallyPoints);
 rankings_type!(AverageRankRating);
 rankings_type!(PersonalRecordWorldRecord);
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_country", input = RankingsInput, output = Vec<GetCountryRankingsOutput>, scope = RankingsScope)]
+pub struct GetCountryRankings;
+
+#[derive(GetId, GetCategory, GetSessionToken)]
+pub struct GetCountryRankingsOutput {
+    pub region_id: AverageFinish,
+    pub rank: i32,
+    pub value: f64,
+}

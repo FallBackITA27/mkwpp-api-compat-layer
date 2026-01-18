@@ -36,4 +36,3 @@ pub fn attribute_is_match(attr: &syn::Attribute, str_to_match: &str) -> bool {
 
     out
 }
-

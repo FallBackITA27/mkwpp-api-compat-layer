@@ -9,6 +9,7 @@ pub mod cups;
 pub mod players;
 pub mod rankings;
 pub mod regions;
+pub mod scores;
 pub mod standard_levels;
 pub mod standards;
 pub mod tracks;

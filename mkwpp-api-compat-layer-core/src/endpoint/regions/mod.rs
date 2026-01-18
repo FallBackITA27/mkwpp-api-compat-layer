@@ -21,12 +21,18 @@ pub struct GetRegionsWithPlayerCount;
 
 #[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[internal(path = "/get_descendants", output = Vec<i32>, scope = RegionsScope)]
+#[internal(path = "/get_descendants", input = GetRegionsDescAncInput, output = Vec<i32>, scope = RegionsScope)]
 pub struct GetRegionsDescendants;
+
+#[derive(GetId, GetCategory, GetSessionToken)]
+pub struct GetRegionsDescAncInput {
+    #[internal(id)]
+    id: i32,
+}
 
 #[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[internal(path = "/get_ancestors", output = Vec<i32>, scope = RegionsScope)]
+#[internal(path = "/get_ancestors", input = GetRegionsDescAncInput, output = Vec<i32>, scope = RegionsScope)]
 pub struct GetRegionsAncestors;
 
 #[derive(Default, Endpoint)]
