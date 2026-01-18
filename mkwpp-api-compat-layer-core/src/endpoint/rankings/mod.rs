@@ -1,17 +1,16 @@
 use crate::{
     common_types::{
-        NoData,
         players::PlayersBasic,
         rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,
         },
     },
-    endpoint::{Endpoint, Root, Scope},
+    endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
 };
 
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 pub struct RankingsScope;
 impl Scope for RankingsScope {
@@ -27,20 +26,10 @@ macro_rules! rankings_type {
         paste::paste! { rankings_type!($type, $endpoint, [<Get $type>], [<Get $type Output>]); }
     };
     ($type: ty, $endpoint: literal, $struct_name: ident, $output_struct_name: ident) => {
-        #[derive(Default)]
+        #[derive(Default, Endpoint)]
         #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+        #[internal(path = $endpoint, output = Vec<$output_struct_name>, scope = RankingsScope)]
         pub struct $struct_name;
-
-        impl Endpoint for $struct_name {
-            const PATH: &'static str = $endpoint;
-            const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-            const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-            type InputStruct = NoData;
-            type OutputStruct = Vec<$output_struct_name>;
-
-            type ScopeStruct = RankingsScope;
-        }
 
         #[derive(GetId, GetCategory, GetSessionToken)]
         pub struct $output_struct_name {

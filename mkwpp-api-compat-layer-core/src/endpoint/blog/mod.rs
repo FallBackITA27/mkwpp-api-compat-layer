@@ -1,8 +1,8 @@
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
     common_types::{Filter, UtcTimestamp},
-    endpoint::{Endpoint, Root, Scope},
+    endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
 };
@@ -13,43 +13,23 @@ impl Scope for BlogScope {
     type OuterScope = Root;
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_list", input = GetBlogListInput, output = Vec<BlogPost>, scope = BlogScope)]
 pub struct GetBlogList;
-
-impl Endpoint for GetBlogList {
-    const PATH: &'static str = "/get_list";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = GetBlogListInput;
-    type OutputStruct = Vec<BlogPost>;
-
-    type ScopeStruct = BlogScope;
-}
 
 #[derive(GetId, GetCategory, GetSessionToken)]
 pub struct GetBlogListInput {
     filter: Filter,
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_post", input = GetBlogPostInput, output = BlogPost, scope = BlogScope)]
 pub struct GetBlogPost;
 
-impl Endpoint for GetBlogPost {
-    const PATH: &'static str = "/get_post";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = GetBlogListInput;
-    type OutputStruct = Vec<BlogPost>;
-
-    type ScopeStruct = BlogScope;
-}
-
 #[derive(GetId, GetCategory, GetSessionToken)]
-struct GetBlogPostInput {
+pub struct GetBlogPostInput {
     #[internal(id)]
     id: i32,
 }

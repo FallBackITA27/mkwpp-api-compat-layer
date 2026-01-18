@@ -1,5 +1,5 @@
 use mkwpp_api_compat_layer_core::{
-    common_types::{Category, NoData},
+    common_types::NoData,
     compatibility_layer::typescript_wasm::Fetchable,
     endpoint::{
         champs::{GetChamps, GetChampsFilters},

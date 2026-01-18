@@ -1,4 +1,3 @@
-
 use crate::{common_types::NoData, endpoint::champs::GetChampsFilters};
 
 #[derive(Default)]
@@ -6,7 +5,6 @@ pub struct FetchData {
     pub(super) query_string: String,
     pub(super) body: Option<String>,
 }
-
 
 pub trait InputToRequest {
     fn to_input(self) -> FetchData;

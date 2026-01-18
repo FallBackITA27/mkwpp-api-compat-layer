@@ -1,8 +1,8 @@
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::{Category, NoData},
-    endpoint::{Endpoint, RequiredPermission, Root, Scope},
+    common_types::Category,
+    endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };
 
@@ -14,19 +14,9 @@ impl Scope for TracksScope {
     type OuterScope = Root;
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
+#[internal(path = "/get", output = Vec<GetTracksOutput>, scope = TracksScope)]
 pub struct GetTracks;
-
-impl Endpoint for GetTracks {
-    const PATH: &'static str = "/get";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<GetTracksOutput>;
-
-    type ScopeStruct = TracksScope;
-}
 
 #[derive(GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]

@@ -1,8 +1,7 @@
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::NoData,
-    endpoint::{Endpoint, RequiredPermission, Root, Scope},
+    endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };
 
@@ -14,20 +13,10 @@ impl Scope for CupsScope {
     type OuterScope = Root;
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get", output = Vec<GetCupsOutput>, scope = CupsScope)]
 pub struct GetCups;
-
-impl Endpoint for GetCups {
-    const PATH: &'static str = "/get";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<GetCupsOutput>;
-
-    type ScopeStruct = CupsScope;
-}
 
 #[derive(GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]

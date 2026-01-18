@@ -1,11 +1,8 @@
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::{
-        NoData,
-        players::{Players, PlayersBasic},
-    },
-    endpoint::{Endpoint, Root, Scope},
+    common_types::players::{Players, PlayersBasic},
+    endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
 };
@@ -17,20 +14,10 @@ impl Scope for PlayersScope {
     type OuterScope = Root;
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get", input = GetPlayersInput, output = GetPlayersOutput, scope = PlayersScope)]
 pub struct GetPlayers;
-
-impl Endpoint for GetPlayers {
-    const PATH: &'static str = "/get";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = GetPlayersInput;
-    type OutputStruct = GetPlayersOutput;
-
-    type ScopeStruct = PlayersScope;
-}
 
 #[derive(GetId, GetSessionToken, GetCategory)]
 pub struct GetPlayersInput {
@@ -46,17 +33,7 @@ pub enum GetPlayersOutput {
     BasicVec(Vec<PlayersBasic>),
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/list", output = Vec<PlayersBasic>, scope = PlayersScope)]
 pub struct GetList;
-
-impl Endpoint for GetList {
-    const PATH: &'static str = "/list";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<PlayersBasic>;
-
-    type ScopeStruct = PlayersScope;
-}

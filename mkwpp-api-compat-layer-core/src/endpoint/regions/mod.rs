@@ -1,12 +1,9 @@
-use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 use serde::ser::SerializeMap;
 
 use crate::{
-    common_types::{
-        NoData,
-        regions::{RegionType, Regions, RegionsWithPlayerCount},
-    },
-    endpoint::{Endpoint, Root, Scope},
+    common_types::regions::{RegionType, Regions, RegionsWithPlayerCount},
+    endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
 };
@@ -17,80 +14,30 @@ impl Scope for RegionsScope {
     type OuterScope = Root;
 }
 
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_with_player_count", output = Vec<RegionsWithPlayerCount>, scope = RegionsScope)]
 pub struct GetRegionsWithPlayerCount;
 
-impl Endpoint for GetRegionsWithPlayerCount {
-    const PATH: &'static str = "/get_with_player_count";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<RegionsWithPlayerCount>;
-
-    type ScopeStruct = RegionsScope;
-}
-
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_descendants", output = Vec<i32>, scope = RegionsScope)]
 pub struct GetRegionsDescendants;
 
-impl Endpoint for GetRegionsDescendants {
-    const PATH: &'static str = "/get_descendants";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<i32>;
-
-    type ScopeStruct = RegionsScope;
-}
-
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_ancestors", output = Vec<i32>, scope = RegionsScope)]
 pub struct GetRegionsAncestors;
 
-impl Endpoint for GetRegionsAncestors {
-    const PATH: &'static str = "/get_ancestors";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = Vec<i32>;
-
-    type ScopeStruct = RegionsScope;
-}
-
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/type_hashmap", output = std::collections::HashMap<RegionType, Vec<Regions>>, scope = RegionsScope)]
 pub struct GetRegionsTypeHashmap;
 
-impl Endpoint for GetRegionsTypeHashmap {
-    const PATH: &'static str = "/type_hashmap";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = std::collections::HashMap<RegionType, Vec<Regions>>;
-
-    type ScopeStruct = RegionsScope;
-}
-
-#[derive(Default)]
+#[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/child_tree", output = RegionChildrenTree, scope = RegionsScope)]
 pub struct GetRegionsChildrenTree;
-
-impl Endpoint for GetRegionsChildrenTree {
-    const PATH: &'static str = "/child_tree";
-    const REQUEST_METHOD: RequestMethod = RequestMethod::Get;
-    const REQUIRED_PERMISSION: RequiredPermission = RequiredPermission::None;
-
-    type InputStruct = NoData;
-    type OutputStruct = RegionChildrenTree;
-
-    type ScopeStruct = RegionsScope;
-}
 
 #[derive(GetId, GetSessionToken, GetCategory)]
 pub struct RegionChildrenTree {
