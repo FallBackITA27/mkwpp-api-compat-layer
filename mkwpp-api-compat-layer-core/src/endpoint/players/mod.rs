@@ -1,5 +1,6 @@
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+
 use crate::{
-    common_data_traits::{GetCategory, GetId, GetSessionToken},
     common_types::{
         NoData,
         players::{Players, PlayersBasic},
@@ -31,12 +32,10 @@ impl Endpoint for GetPlayers {
     type ScopeStruct = PlayersScope;
 }
 
+#[derive(GetId, GetSessionToken, GetCategory)]
 struct GetPlayersInput {
     basic: bool,
 }
-impl GetId for GetPlayersInput {}
-impl GetCategory for GetPlayersInput {}
-impl GetSessionToken for GetPlayersInput {}
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]

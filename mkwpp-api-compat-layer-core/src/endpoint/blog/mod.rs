@@ -1,5 +1,7 @@
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+
 use crate::{
-    common_data_traits::{GetCategory, GetId, GetSessionToken, HasId},
+    common_data_traits::{GetCategory, GetSessionToken},
     common_types::{Filter, UtcTimestamp},
     endpoint::{Endpoint, Root, Scope},
     request_method::RequestMethod,
@@ -27,12 +29,10 @@ impl Endpoint for GetBlogList {
     type ScopeStruct = BlogScope;
 }
 
+#[derive(GetId, GetCategory, GetSessionToken)]
 struct GetBlogListInput {
     filter: Filter,
 }
-impl GetId for GetBlogListInput {}
-impl GetCategory for GetBlogListInput {}
-impl GetSessionToken for GetBlogListInput {}
 
 #[derive(Default)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
@@ -49,36 +49,38 @@ impl Endpoint for GetBlogPost {
     type ScopeStruct = BlogScope;
 }
 
+#[derive(GetId, GetCategory, GetSessionToken)]
 struct GetBlogPostInput {
+    #[internal(id)]
     id: i32,
 }
-impl HasId for GetBlogPostInput {
-    fn get_id(&self) -> i32 {
-        self.id
-    }
-}
-impl GetCategory for GetBlogPostInput {}
-impl GetSessionToken for GetBlogPostInput {}
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 #[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
 pub struct BlogPost {
     #[wasm_bindgen(readonly)]
+    #[internal(id)]
     pub id: i32,
+
     #[wasm_bindgen(readonly)]
     #[wasm_bindgen(getter_with_clone)]
     pub title: String,
+
     #[wasm_bindgen(readonly)]
     #[wasm_bindgen(getter_with_clone)]
     pub content: String,
+
     #[wasm_bindgen(readonly)]
     pub is_published: bool,
+
     #[wasm_bindgen(readonly)]
     pub published_at: UtcTimestamp,
+
     #[wasm_bindgen(readonly)]
     pub author_id: Option<i32>,
+
     #[wasm_bindgen(readonly)]
     #[wasm_bindgen(getter_with_clone)]
     pub username: Option<String>,

@@ -28,12 +28,12 @@ where
 
 // Item session Token
 pub trait HasSessionToken {
-    fn get_token(&self) -> &str;
+    fn get_session_token(&self) -> &str;
 }
 
 pub trait GetSessionToken {
     const HAS_SESSION_TOKEN: bool = false;
-    fn get_token(&self) -> &str {
+    fn get_session_token(&self) -> &str {
         Default::default()
     }
 }
@@ -43,8 +43,8 @@ where
     T: HasSessionToken,
 {
     const HAS_SESSION_TOKEN: bool = true;
-    fn get_token(&self) -> &str {
-        HasSessionToken::get_token(self)
+    fn get_session_token(&self) -> &str {
+        HasSessionToken::get_session_token(self)
     }
 }
 

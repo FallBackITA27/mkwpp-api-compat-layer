@@ -92,7 +92,7 @@ impl From<i32> for Filter {
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct UtcTimestamp(f64);
 
-#[derive(Clone, Copy)]
+#[derive(Debug, Clone, Copy)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct ChadsoftID(i64);
 

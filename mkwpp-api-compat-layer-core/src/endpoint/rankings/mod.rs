@@ -11,6 +11,8 @@ use crate::{
     required_permission::RequiredPermission,
 };
 
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+
 pub struct RankingsScope;
 impl Scope for RankingsScope {
     const PATH: &'static str = "/rankings";
@@ -40,6 +42,7 @@ macro_rules! rankings_type {
             type ScopeStruct = RankingsScope;
         }
 
+        #[derive(GetId, GetCategory, GetSessionToken)]
         pub struct $output_struct_name {
             pub rank: i32,
             pub value: $type,

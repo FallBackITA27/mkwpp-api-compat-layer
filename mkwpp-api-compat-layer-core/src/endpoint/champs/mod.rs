@@ -1,3 +1,5 @@
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
+
 use crate::{
     common_data_traits::{GetCategory, GetId, GetSessionToken, HasId},
     common_types::{Category, NoData, UtcTimestamp},
@@ -28,13 +30,12 @@ impl Endpoint for GetChamps {
 }
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[derive(GetId, GetSessionToken)]
 pub struct GetChampsFilters {
     #[wasm_bindgen(readonly)]
     pub(crate) category: Option<Category>,
 }
 
-impl GetId for GetChampsFilters {}
-impl GetSessionToken for GetChampsFilters {}
 impl GetCategory for GetChampsFilters {
     fn get_category(&self) -> Category {
         self.category.unwrap_or(Category::Normal)
@@ -44,19 +45,19 @@ impl GetCategory for GetChampsFilters {
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 #[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
+#[derive(GetId, GetCategory, GetSessionToken)]
 pub struct GetChampsOutput {
     #[wasm_bindgen(readonly)]
+    #[internal(id)]
     pub id: i32,
+
     #[wasm_bindgen(readonly)]
     pub player_id: i32,
+
     #[wasm_bindgen(readonly)]
+    #[internal(category)]
     pub category: Category,
+
     #[wasm_bindgen(readonly)]
     pub date_instated: UtcTimestamp,
-}
-
-impl HasId for GetChampsOutput {
-    fn get_id(&self) -> i32 {
-        self.id
-    }
 }

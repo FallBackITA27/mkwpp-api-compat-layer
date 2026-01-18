@@ -1,3 +1,4 @@
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 use serde::ser::SerializeMap;
 
 use crate::{
@@ -92,8 +93,11 @@ impl Endpoint for GetRegionsChildrenTree {
     type ScopeStruct = RegionsScope;
 }
 
+#[derive(GetId, GetSessionToken, GetCategory)]
 pub struct RegionChildrenTree {
+    #[internal(id)]
     pub id: i32,
+
     pub children: Option<Vec<RegionChildrenTree>>,
 }
 

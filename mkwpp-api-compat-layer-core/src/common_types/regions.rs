@@ -1,6 +1,5 @@
+use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 use serde::de::Visitor;
-
-use crate::common_data_traits::HasId;
 
 #[either_field::make_template(
     GenStructs: true,
@@ -9,35 +8,29 @@ use crate::common_data_traits::HasId;
     pub Regions: [ player_count: _ ],
     pub RegionsWithPlayerCount: [ player_count: i32 ],
 )]
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 #[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
 pub struct RegionsTemplate {
     #[wasm_bindgen(readonly)]
+    #[internal(id)]
     pub id: i32,
+
     #[wasm_bindgen(readonly)]
     #[wasm_bindgen(getter_with_clone)]
     pub code: String,
+
     #[wasm_bindgen(readonly)]
     pub region_type: RegionType,
+
     pub parent_id: Option<i32>,
+
     #[wasm_bindgen(readonly)]
     pub is_ranked: bool,
+
     #[wasm_bindgen(readonly)]
     pub player_count: either_field::either!(() | i32),
-}
-
-impl HasId for RegionsWithPlayerCount {
-    fn get_id(&self) -> i32 {
-        self.id
-    }
-}
-
-impl HasId for Regions {
-    fn get_id(&self) -> i32 {
-        self.id
-    }
 }
 
 #[derive(Clone, Copy, Debug)]

@@ -28,7 +28,7 @@ where
         let headers = web_sys::Headers::new().unwrap();
 
         if <Self as Endpoint>::InputStruct::HAS_SESSION_TOKEN {
-            headers.append("Bearer-Token", inputs.get_token())?;
+            headers.append("Bearer-Token", inputs.get_session_token())?;
         }
 
         if Self::REQUEST_METHOD != RequestMethod::Get {
