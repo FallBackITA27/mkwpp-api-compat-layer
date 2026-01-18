@@ -33,13 +33,13 @@ impl Endpoint for GetPlayers {
 }
 
 #[derive(GetId, GetSessionToken, GetCategory)]
-struct GetPlayersInput {
+pub struct GetPlayersInput {
     basic: bool,
 }
 
 #[derive(serde::Serialize, serde::Deserialize)]
 #[serde(untagged)]
-enum GetPlayersOutput {
+pub enum GetPlayersOutput {
     NormalOne(Players),
     NormalVec(Vec<Players>),
     BasicOne(PlayersBasic),

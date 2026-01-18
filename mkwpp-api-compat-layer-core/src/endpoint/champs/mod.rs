@@ -1,8 +1,8 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_data_traits::{GetCategory, GetId, GetSessionToken, HasId},
-    common_types::{Category, NoData, UtcTimestamp},
+    common_data_traits::GetCategory,
+    common_types::{Category, UtcTimestamp},
     endpoint::{Endpoint, Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,

@@ -1,20 +1,12 @@
-use web_sys::RequestInit;
 
 use crate::{common_types::NoData, endpoint::champs::GetChampsFilters};
 
+#[derive(Default)]
 pub struct FetchData {
     pub(super) query_string: String,
     pub(super) body: Option<String>,
 }
 
-impl Default for FetchData {
-    fn default() -> Self {
-        FetchData {
-            query_string: String::new(),
-            body: None,
-        }
-    }
-}
 
 pub trait InputToRequest {
     fn to_input(self) -> FetchData;

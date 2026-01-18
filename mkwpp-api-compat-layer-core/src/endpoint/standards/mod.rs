@@ -1,7 +1,6 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_data_traits::HasId,
     common_types::{Category, NoData},
     endpoint::{Endpoint, Root, Scope},
     request_method::RequestMethod,

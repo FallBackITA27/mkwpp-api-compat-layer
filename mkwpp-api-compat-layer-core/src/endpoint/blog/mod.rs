@@ -1,7 +1,6 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_data_traits::{GetCategory, GetSessionToken},
     common_types::{Filter, UtcTimestamp},
     endpoint::{Endpoint, Root, Scope},
     request_method::RequestMethod,
@@ -30,7 +29,7 @@ impl Endpoint for GetBlogList {
 }
 
 #[derive(GetId, GetCategory, GetSessionToken)]
-struct GetBlogListInput {
+pub struct GetBlogListInput {
     filter: Filter,
 }
 

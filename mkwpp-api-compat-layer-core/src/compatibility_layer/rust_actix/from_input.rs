@@ -2,7 +2,7 @@ use crate::{
     common_types::{Category, NoData},
     endpoint::champs::GetChampsFilters,
 };
-use actix_web::{HttpMessage, HttpRequest};
+use actix_web::HttpRequest;
 
 pub trait InputFromActix {
     fn get_from_request(request: &mut HttpRequest) -> Self;

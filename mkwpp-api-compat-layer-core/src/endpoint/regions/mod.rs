@@ -2,9 +2,8 @@ use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 use serde::ser::SerializeMap;
 
 use crate::{
-    common_data_traits::{GetId, GetSessionToken, HasId},
     common_types::{
-        Category, NoData, UtcTimestamp,
+        NoData,
         regions::{RegionType, Regions, RegionsWithPlayerCount},
     },
     endpoint::{Endpoint, Root, Scope},

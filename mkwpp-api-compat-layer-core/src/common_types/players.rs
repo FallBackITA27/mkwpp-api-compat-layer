@@ -62,8 +62,10 @@ pub struct PlayersTemplate {
     pub last_activity: either_field::either!(() | UtcTimestamp),
 
     #[wasm_bindgen(readonly)]
+    #[wasm_bindgen(getter_with_clone)]
     pub submitters: either_field::either!(() | Vec<i32>),
 
     #[wasm_bindgen(readonly)]
+    #[wasm_bindgen(getter_with_clone)]
     pub chadsoft_ids: either_field::either!(() | Vec<ChadsoftID>),
 }
