@@ -2,7 +2,7 @@ use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToke
 
 use crate::{
     common_types::{
-        Category, LapMode, UtcTimestamp,
+        category::Category, lap_mode::LapMode, UtcTimestamp,
         limit::Limit,
         rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,

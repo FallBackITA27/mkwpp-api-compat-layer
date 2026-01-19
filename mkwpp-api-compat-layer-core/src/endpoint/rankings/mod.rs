@@ -1,6 +1,6 @@
 use crate::{
     common_types::{
-        Category, LapMode,
+        category::Category, lap_mode::LapMode,
         players::PlayersBasic,
         rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,

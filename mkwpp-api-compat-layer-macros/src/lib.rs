@@ -28,7 +28,7 @@ pub fn derive_get_category(input: proc_macro::TokenStream) -> proc_macro::TokenS
         Ident::new("GetCategory", Span::call_site()),
         Ident::new("HasCategory", Span::call_site()),
         Ident::new("get_category", Span::call_site()),
-        syn::Type::Verbatim(quote! { crate::common_types::Category }),
+        syn::Type::Verbatim(quote! { crate::common_types::category::Category }),
     )
 }
 
@@ -79,6 +79,41 @@ pub fn derive_endpoint(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
             type OutputStruct = #output_struct_name;
 
             type ScopeStruct = #scope_struct_name;
+        }
+    }
+    .into()
+}
+
+#[proc_macro_derive(FromIntoInner)]
+pub fn derive_frominto_inner(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let input_struct = parse_macro_input!(input as syn::ItemStruct);
+
+    if input_struct.fields.len() != 1 {
+        panic!("Struct Length != 1");
+    }
+
+    let field = input_struct.fields.iter().next().unwrap();
+
+    if field.ident.is_some() {
+        panic!("Not tuple struct");
+    }
+
+    let struct_name = input_struct.ident;
+    let field_type = &field.ty;
+
+    quote! {
+        #[automatically_derived]
+        impl From<#field_type> for #struct_name {
+            fn from(value: #field_type) -> Self {
+                Self(value)
+            }
+        }
+
+        #[automatically_derived]
+        impl From<#struct_name> for #field_type {
+            fn from(value: #struct_name) -> Self {
+                value.0
+            }
         }
     }
     .into()
