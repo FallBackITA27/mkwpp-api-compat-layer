@@ -17,6 +17,7 @@ pub fn derive_get_id(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
         Ident::new("HasId", Span::call_site()),
         Ident::new("get_id", Span::call_site()),
         syn::Type::Verbatim(quote! { i32 }),
+        false,
     )
 }
 
@@ -29,6 +30,7 @@ pub fn derive_get_category(input: proc_macro::TokenStream) -> proc_macro::TokenS
         Ident::new("HasCategory", Span::call_site()),
         Ident::new("get_category", Span::call_site()),
         syn::Type::Verbatim(quote! { crate::common_types::category::Category }),
+        false,
     )
 }
 
@@ -41,6 +43,7 @@ pub fn derive_get_session_token(input: proc_macro::TokenStream) -> proc_macro::T
         Ident::new("HasSessionToken", Span::call_site()),
         Ident::new("get_session_token", Span::call_site()),
         syn::Type::Verbatim(quote! { &str }),
+        true,
     )
 }
 

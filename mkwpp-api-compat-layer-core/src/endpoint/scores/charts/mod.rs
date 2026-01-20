@@ -1,7 +1,7 @@
 use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::{category::Category, UtcTimestamp, limit::Limit, scores::ScoresWithPlayer},
+    common_types::{UtcTimestamp, category::Category, limit::Limit, scores::ScoresWithPlayer},
     endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };

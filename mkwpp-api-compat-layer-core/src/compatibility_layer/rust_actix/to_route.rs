@@ -3,7 +3,8 @@ use actix_web::{HttpRequest, HttpResponse, Route, web};
 use super::from_input::InputFromActix;
 use crate::{
     endpoint::Endpoint,
-    error::{FinalErrorResponse, PPResult}, required_permission::RequiredPermission,
+    error::{FinalErrorResponse, PPResult},
+    required_permission::RequiredPermission,
 };
 
 pub trait ToActixRoute: Endpoint

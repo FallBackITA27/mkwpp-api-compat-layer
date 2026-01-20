@@ -67,4 +67,3 @@ impl<'de> serde::Deserialize<'de> for Category {
         deserializer.deserialize_u8(CategoryVisitor)
     }
 }
-

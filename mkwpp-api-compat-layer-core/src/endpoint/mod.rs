@@ -5,6 +5,7 @@ use crate::{
 
 pub mod blog;
 pub mod champs;
+pub mod submissions;
 pub mod cups;
 pub mod players;
 pub mod rankings;
@@ -13,6 +14,7 @@ pub mod scores;
 pub mod standard_levels;
 pub mod standards;
 pub mod tracks;
+pub mod users;
 
 pub trait Endpoint: Default {
     const PATH: &'static str;

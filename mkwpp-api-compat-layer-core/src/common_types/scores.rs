@@ -1,7 +1,7 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::common_types::{
-    category::Category, UtcTimestamp, players::PlayersBasic, rankings::PersonalRecordWorldRecord,
+    UtcTimestamp, category::Category, players::PlayersBasic, rankings::PersonalRecordWorldRecord,
 };
 
 #[either_field::make_template(

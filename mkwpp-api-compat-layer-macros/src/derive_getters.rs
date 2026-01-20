@@ -11,6 +11,7 @@ pub fn derive_getter(
     has_trait_name: Ident,
     get_function_name: Ident,
     out_type: syn::Type,
+    return_reference: bool,
 ) -> proc_macro::TokenStream {
     let input_struct = parse_macro_input!(input as syn::ItemStruct);
 
@@ -37,6 +38,15 @@ pub fn derive_getter(
 
     match out_ident {
         None => quote! { #[automatically_derived] impl #get_trait_path for #struct_name {} },
+        Some(v) if return_reference => quote! {
+            #[automatically_derived]
+            impl #has_trait_path for #struct_name {
+                #[inline]
+                fn #get_function_name(&self) -> #out_type {
+                    &self.#v
+                }
+            }
+        },
         Some(v) => quote! {
             #[automatically_derived]
             impl #has_trait_path for #struct_name {

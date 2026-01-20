@@ -25,6 +25,7 @@ web-sys = { version = "0.3.77", optional = true, features = [
   'Window',
 ] }
 mkwpp-api-compat-layer-macros = { path="../mkwpp-api-compat-layer-macros" }
+regex = "1.12.2"
 
 [dev-dependencies]
 strum = { version = "*", features = ["derive"] }

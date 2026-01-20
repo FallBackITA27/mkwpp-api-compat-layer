@@ -1,5 +1,5 @@
 use crate::{
-    common_types::{category::Category, NoData},
+    common_types::{NoData, category::Category},
     endpoint::champs::GetChampsFilters,
 };
 use actix_web::HttpRequest;

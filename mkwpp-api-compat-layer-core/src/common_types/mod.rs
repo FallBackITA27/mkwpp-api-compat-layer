@@ -1,13 +1,15 @@
 use mkwpp_api_compat_layer_macros::FromIntoInner;
 use serde::de::Visitor;
 
-pub mod limit;
 pub mod category;
+pub mod submissions;
 pub mod lap_mode;
+pub mod limit;
 pub mod players;
 pub mod rankings;
 pub mod regions;
 pub mod scores;
+pub mod user;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, FromIntoInner)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]

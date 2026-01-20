@@ -6,13 +6,22 @@ use crate::common_types::{ChadsoftID, UtcTimestamp};
     GenStructs: true,
     DeleteTemplate: true,
     OmitEmptyTupleFields: true;
-    pub Players: [
+    pub PlayersLoggedIn: [
         bio: Option<String>,
         pronouns: Option<String>,
         region_id: i32,
         joined_date: UtcTimestamp,
         last_activity: UtcTimestamp,
         submitters: Vec<i32>,
+        chadsoft_ids: Vec<ChadsoftID>
+    ],
+    pub Players: [
+        bio: Option<String>,
+        pronouns: Option<String>,
+        region_id: i32,
+        joined_date: UtcTimestamp,
+        last_activity: UtcTimestamp,
+        submitters: (),
         chadsoft_ids: Vec<ChadsoftID>
     ],
     pub PlayersBasic: [

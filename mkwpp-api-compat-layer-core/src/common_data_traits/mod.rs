@@ -1,4 +1,4 @@
-use crate::common_types::{category::Category, NoData};
+use crate::common_types::{NoData, category::Category};
 
 /// Marker Type
 pub trait DataTraits: GetId + GetSessionToken + GetCategory {}

@@ -2,7 +2,7 @@ use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToke
 
 use crate::{
     common_data_traits::GetCategory,
-    common_types::{category::Category, UtcTimestamp},
+    common_types::{UtcTimestamp, category::Category},
     endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
