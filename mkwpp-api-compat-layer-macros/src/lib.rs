@@ -1,11 +1,12 @@
 use proc_macro2::Span;
-use quote::quote;
-use syn::{Ident, parse_macro_input};
+use quote::{ToTokens, quote};
+use syn::{Ident, parse::Parse, parse_macro_input};
 
 use crate::derive_endpoint::EndpointArgs;
 
 mod derive_endpoint;
 mod derive_getters;
+mod to_scope;
 mod utils;
 
 #[proc_macro_derive(GetId, attributes(internal))]
@@ -120,4 +121,10 @@ pub fn derive_frominto_inner(input: proc_macro::TokenStream) -> proc_macro::Toke
         }
     }
     .into()
+}
+
+#[proc_macro]
+pub fn to_scope(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let v = parse_macro_input!(input as to_scope::Scope);
+    v.into_token_stream().into()
 }

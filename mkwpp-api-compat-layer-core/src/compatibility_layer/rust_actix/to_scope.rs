@@ -2,59 +2,89 @@ use super::{from_input::InputFromActix, to_route::ToActixRoute};
 use crate::{
     endpoint::{
         Endpoint, Root, Scope,
+        blog::{BlogScope, GetBlogList, GetBlogPost},
         champs::{ChampsScope, GetChamps},
         cups::{CupsScope, GetCups},
+        players::{
+            AddSubmitter, GetList, GetPlayers, GetSubmittees, GetSubmitters, PlayersScope,
+            RemoveSubmitter, SetSubmitters, UpdateAlias, UpdateBio, UpdatePronouns,
+        },
+        rankings::{
+            GetAverageFinish, GetAverageRankRating, GetCountryRankings,
+            GetPersonalRecordWorldRecord, GetTallyPoints, GetTotalTime, RankingsScope,
+        },
         regions::{
-            GetRegionsAncestors, GetRegionsDescendants, GetRegionsWithPlayerCount, RegionsScope,
+            GetRegionsAncestors, GetRegionsChildrenTree, GetRegionsDescendants,
+            GetRegionsTypeHashmap, GetRegionsWithPlayerCount, RegionsScope,
+        },
+        scores::{
+            GetRecentScores, GetRecords, ScoresScope,
+            charts::{ChartsScope, GetCharts, GetChartsDates},
+            timesheet::{GetLinechart, GetMatchup, GetTimesheet, TimesheetScope},
         },
         standard_levels::{GetStandardLevels, StandardLevelsScope},
         standards::{GetStandards, StandardsScope},
+        submissions::{
+            CreateEditSubmission, CreateSubmission, EditEditSubmission, EditSubmission,
+            GetEditSubmissionsList, GetSubmissionsList, SubmissionsScope,
+        },
         tracks::{GetTracks, TracksScope},
+        users::{
+            ActivateUser, GetUser, LoginUser, LogoutUser, PasswordForgot, PasswordReset,
+            PasswordResetTokenCheck, RegisterUser, UsersScope,
+        },
     },
     error::PPResult,
 };
+
 use actix_web::web;
-use paste::paste;
 
-macro_rules! to_actix_scope_macro {
-    ($scope_name:ident) => {
-        impl $scope_name {
-            pub fn to_actix_scope() -> actix_web::Scope {
-                web::scope(Self::PATH)
-            }
-        }
-    };
-    ($scope_name:ident; $($route:ident),*) => {
-        impl $scope_name {
-            paste! {
-                pub fn to_actix_scope(
-                    $([< $route:snake _handler >]:
-                        impl AsyncFn(<$route as Endpoint>::InputStruct)
-                            -> PPResult<<$route as Endpoint>::OutputStruct> + 'static
-                    ),*
-                ) -> actix_web::Scope
-                    where
-                        $(
-                            <$route as Endpoint>::InputStruct: InputFromActix,
-                            <$route as Endpoint>::OutputStruct: serde::Serialize
-                        ),*
-                {
-                    web::scope(Self::PATH)
-                    $(
-                        .route(
-                            $route::PATH, $route::to_actix_route([< $route:snake _handler >])
-                        )
-                    )*
-                }
-            }
-        }
-    };
-}
-
-to_actix_scope_macro!(Root);
-to_actix_scope_macro!(CupsScope; GetCups);
-to_actix_scope_macro!(TracksScope; GetTracks);
-to_actix_scope_macro!(StandardsScope; GetStandards);
-to_actix_scope_macro!(StandardLevelsScope; GetStandardLevels);
-to_actix_scope_macro!(ChampsScope; GetChamps);
-to_actix_scope_macro!(RegionsScope; GetRegionsWithPlayerCount, GetRegionsAncestors, GetRegionsDescendants);
+mkwpp_api_compat_layer_macros::to_scope!(
+    Root: [
+        CupsScope: [ GetCups ],
+        TracksScope: [ GetTracks ],
+        StandardsScope: [ GetStandards ],
+        StandardLevelsScope: [ GetStandardLevels ],
+        ChampsScope: [ GetChamps ],
+        RegionsScope: [
+            GetRegionsWithPlayerCount,
+            GetRegionsAncestors,
+            GetRegionsDescendants,
+            GetRegionsTypeHashmap,
+            GetRegionsChildrenTree
+        ],
+        BlogScope: [ GetBlogList, GetBlogPost ],
+        PlayersScope: [
+            AddSubmitter, GetList, GetPlayers,
+            GetSubmittees, GetSubmitters,
+            RemoveSubmitter, SetSubmitters,
+            UpdateAlias, UpdateBio, UpdatePronouns
+        ],
+        RankingsScope: [
+            GetAverageFinish,
+            GetAverageRankRating,
+            GetCountryRankings,
+            GetPersonalRecordWorldRecord,
+            GetTallyPoints,
+            GetTotalTime
+        ],
+        SubmissionsScope: [
+            GetSubmissionsList,
+            GetEditSubmissionsList,
+            CreateSubmission,
+            CreateEditSubmission,
+            EditSubmission,
+            EditEditSubmission
+        ],
+        UsersScope: [
+            ActivateUser, GetUser, LoginUser,
+            LogoutUser, PasswordForgot, PasswordReset,
+            PasswordResetTokenCheck, RegisterUser
+        ],
+        ScoresScope: [
+            GetRecentScores, GetRecords,
+            ChartsScope: [ GetCharts, GetChartsDates ],
+            TimesheetScope: [ GetLinechart, GetMatchup, GetTimesheet ]
+        ],
+    ]
+);

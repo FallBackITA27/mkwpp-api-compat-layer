@@ -2,9 +2,11 @@ use actix_web::{HttpRequest, HttpResponse, Route, web};
 
 use super::from_input::InputFromActix;
 use crate::{
+    common_data_traits::GetSessionToken,
     endpoint::Endpoint,
-    error::{FinalErrorResponse, PPResult},
+    error::{ErrorCodes, FinalErrorResponse, PPResult},
     required_permission::RequiredPermission,
+    status_code::StatusCode,
 };
 
 pub trait ToActixRoute: Endpoint
@@ -22,6 +24,17 @@ where
             let handler = handler.clone();
             async move {
                 let input = Self::InputStruct::get_from_request(&mut req);
+
+                if Self::REQUIRED_PERMISSION == RequiredPermission::None
+                    && !Self::InputStruct::HAS_SESSION_TOKEN
+                {
+                    // If fail here then something is wrong in the endpoints
+                    // lol need to do None::<&str>
+                    return Err(ErrorCodes::InsufficientPermissions
+                        .into_final_error(None::<&str>, file!(), line!())
+                        .into_response(StatusCode::Forbidden));
+                }
+
                 let data = handler(input).await?;
                 Ok::<HttpResponse, FinalErrorResponse>(HttpResponse::Ok().json(data))
             }
