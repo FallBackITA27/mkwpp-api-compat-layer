@@ -27,7 +27,7 @@ pub struct GetRegionsDescendants;
 #[derive(GetId, GetCategory, GetSessionToken)]
 pub struct GetRegionsDescAncInput {
     #[internal(id)]
-    id: i32,
+    pub id: i32,
 }
 
 #[derive(Default, Endpoint)]

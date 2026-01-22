@@ -23,7 +23,7 @@ where
         let inner_handler = move |mut req: HttpRequest| {
             let handler = handler.clone();
             async move {
-                let input = Self::InputStruct::get_from_request(&mut req);
+                let input = Self::InputStruct::get_from_request(&mut req)?;
 
                 if Self::REQUIRED_PERMISSION == RequiredPermission::None
                     && !Self::InputStruct::HAS_SESSION_TOKEN

@@ -1,4 +1,4 @@
-use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix};
 
 use crate::{
     common_types::{UtcTimestamp, limit::Limit},
@@ -18,7 +18,7 @@ impl Scope for BlogScope {
 #[internal(path = "/get_list", input = GetBlogListInput, output = Vec<BlogPost>, scope = BlogScope)]
 pub struct GetBlogList;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(GetId, GetCategory, GetSessionToken, InputFromActix)]
 pub struct GetBlogListInput {
     filter: Limit,
 }

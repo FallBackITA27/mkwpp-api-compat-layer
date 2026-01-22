@@ -2,13 +2,13 @@ use mkwpp_api_compat_layer_macros::FromIntoInner;
 use serde::de::Visitor;
 
 pub mod category;
-pub mod submissions;
 pub mod lap_mode;
 pub mod limit;
 pub mod players;
 pub mod rankings;
 pub mod regions;
 pub mod scores;
+pub mod submissions;
 pub mod user;
 
 #[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, FromIntoInner)]

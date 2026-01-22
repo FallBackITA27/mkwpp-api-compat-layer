@@ -19,7 +19,7 @@ impl TryInto<SubmissionStatus> for u8 {
             0 => Ok(SubmissionStatus::Pending),
             1 => Ok(SubmissionStatus::Accepted),
             2 => Ok(SubmissionStatus::Rejected),
-            3 => Ok(SubmissionStatus::OnHold)
+            3 => Ok(SubmissionStatus::OnHold),
             3..=255 => Err(()),
         }
     }
@@ -28,10 +28,10 @@ impl TryInto<SubmissionStatus> for u8 {
 impl From<SubmissionStatus> for u8 {
     fn from(val: SubmissionStatus) -> Self {
         match val {
-     SubmissionStatus::Pending       => 0,
-     SubmissionStatus::Accepted       => 1,
-     SubmissionStatus::Rejected       => 2,
-     SubmissionStatus::OnHold       => 3,
+            SubmissionStatus::Pending => 0,
+            SubmissionStatus::Accepted => 1,
+            SubmissionStatus::Rejected => 2,
+            SubmissionStatus::OnHold => 3,
         }
     }
 }
@@ -75,6 +75,8 @@ impl<'de> serde::Deserialize<'de> for SubmissionStatus {
 }
 
 #[derive(GetId, GetCategory, GetSessionToken)]
+#[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
+#[serde_with::skip_serializing_none]
 pub struct Submissions {
     #[internal(id)]
     pub id: i32,
@@ -82,7 +84,7 @@ pub struct Submissions {
     pub value: i32,
 
     #[internal(category)]
-    pub category: Category
+    pub category: Category,
 
     pub is_lap: bool,
 
@@ -109,7 +111,7 @@ pub struct Submissions {
     pub submitted_at: UtcTimestamp,
 
     pub reviewer_id: Option<i32>,
-    
+
     pub reviewer_note: Option<String>,
 
     pub reviewed_at: Option<UtcTimestamp>,
@@ -118,6 +120,8 @@ pub struct Submissions {
 }
 
 #[derive(GetId, GetCategory, GetSessionToken)]
+#[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
+#[serde_with::skip_serializing_none]
 pub struct EditSubmissions {
     #[internal(id)]
     pub id: i32,

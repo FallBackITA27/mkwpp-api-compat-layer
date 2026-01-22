@@ -35,6 +35,7 @@ macro_rules! rankings_type {
         pub struct $struct_name;
 
         #[derive(GetId, GetCategory, GetSessionToken)]
+        #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
         pub struct $output_struct_name {
             pub rank: i32,
             pub value: $type,
@@ -63,6 +64,7 @@ rankings_type!(PersonalRecordWorldRecord);
 #[internal(path = "/get_country", input = RankingsInput, output = Vec<GetCountryRankingsOutput>, scope = RankingsScope)]
 pub struct GetCountryRankings;
 
+#[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[derive(GetId, GetCategory, GetSessionToken)]
 pub struct GetCountryRankingsOutput {
     pub region_id: AverageFinish,

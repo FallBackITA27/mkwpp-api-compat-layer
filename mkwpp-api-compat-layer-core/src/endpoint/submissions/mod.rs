@@ -1,8 +1,12 @@
-
 use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::{UtcTimestamp, category::Category, submissions::{EditSubmissions, SubmissionStatus, Submissions}, user::UserIdentificationData},
+    common_types::{
+        UtcTimestamp,
+        category::Category,
+        submissions::{EditSubmissions, SubmissionStatus, Submissions},
+        user::UserIdentificationData,
+    },
     endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
 };
@@ -76,7 +80,7 @@ pub struct SubmissionCreation {
     pub reviewer_id: Option<i32>,
 
     #[internal(session_token)]
-    pub session_token: String
+    pub session_token: String,
 }
 
 #[derive(Default, Endpoint)]
