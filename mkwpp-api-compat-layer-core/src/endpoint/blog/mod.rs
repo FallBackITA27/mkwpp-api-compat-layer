@@ -1,4 +1,6 @@
-use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix};
+use mkwpp_api_compat_layer_macros::{
+    Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix,
+};
 
 use crate::{
     common_types::{UtcTimestamp, limit::Limit},

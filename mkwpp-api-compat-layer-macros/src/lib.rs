@@ -1,11 +1,14 @@
+use std::hint::unreachable_unchecked;
+
 use proc_macro2::Span;
 use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
-use crate::derive_endpoint::EndpointArgs;
+use crate::{derive_endpoint::EndpointArgs, derive_input_from_actix::QueryArgs};
 
 mod derive_endpoint;
 mod derive_getters;
+mod derive_input_from_actix;
 mod to_scope;
 mod utils;
 
@@ -128,54 +131,74 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
     let input_struct = parse_macro_input!(input as syn::ItemStruct);
     let struct_name = input_struct.ident;
 
-    match input_struct.fields {
-        syn::Fields::Unit => quote! {
+    let mut return_data = match input_struct.fields{
+        syn::Fields::Unit => return quote! {
             impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
                 fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
                     Ok(Self)
                 }
             }
-        },
-        syn::Fields::Unnamed(_) => {
-            let mut out = proc_macro2::TokenStream::new();
-            
-            for field in input_struct.fields {
-                let ty = field.ty;
-                quote! {
-                    <#ty as crate::compatibility_layer::rust_actix::from_input::InputFromActix>::get_from_request(request)?,
-                }.to_tokens(&mut out);
-            }
-            
-            quote! {
-                impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-                    fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
-                        Ok(Self(#out))
-                    }
-                }
+        }.into(),
+        syn::Fields::Named(_) | syn::Fields::Unnamed(_) => proc_macro2::TokenStream::new(),
+    };
+
+    let mut token_data_tuple = proc_macro2::TokenStream::new();
+    let mut inner_match = proc_macro2::TokenStream::new();
+
+    for (field_num, field) in input_struct.fields.iter().enumerate() {
+        let mut args = None;
+        for attr in &field.attrs {
+            if utils::attribute_is_internal(attr) {
+                args = Some(attr.parse_args().expect("Couldn't parse args"));
+                break;
             }
         }
-        syn::Fields::Named(_) => {
-            let mut out = proc_macro2::TokenStream::new();
-            
-            for field in input_struct.fields {
-                let field_name = unsafe { field.ident.unwrap_unchecked() };
-                let ty = field.ty;
-                quote! {
-                    #field_name : <#ty as crate::compatibility_layer::rust_actix::from_input::InputFromActix>::get_from_request(request)?,
-                }.to_tokens(&mut out);
+        let args: QueryArgs = args.unwrap_or_default();
+        
+        if !args.query_keys.is_empty()
+        quote! { None, }.to_tokens(&mut token_data_tuple);
+
+
+        for (i, key) in args.query_keys.iter().enumerate() {
+            quote! { Some(#key) }.to_tokens(&mut inner_match);
+            if i != 0 {
+                quote! { | }.to_tokens(&mut inner_match);
             }
-            
-            quote! {
-                impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-                    fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
-                        Ok(Self { #out })
-                    }
+        }
+
+                quote! { => acc.#field_num = split.next() }.to_tokens(&mut inner_match);
+                if let Some(v) = args.map {
+                quote! { .map(#v) }.to_tokens(&mut inner_match);
                 }
-            }
+                quote! { , }.to_tokens(&mut inner_match);
+        }
+    }
+
+    let return_data_parenthesized = match input_struct.fields {
+        syn::Fields::Unit => unsafe { unreachable_unchecked() },
+        syn::Fields::Named(_) => quote! { { #return_data } }, syn::Fields::Unnamed(_) => quote! { ( #return_data ) },
+    };
+
+    quote! {
+        impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
+            fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
+                let data = request.query_string().split(&['?', '&']).fold(
+                    ( #token_data_tuple ),
+                    |mut acc, next| {
+                        let mut split = next.split('=');
+                        match split.next() {
+                            #inner_match
+                            _ => (),
+                        };
+                        acc
+                    },
+                );
+
+                Ok(Self #return_data_parenthesized )
+            };
         }
     }.into()
 }
-
 
 #[proc_macro]
 pub fn to_scope(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
