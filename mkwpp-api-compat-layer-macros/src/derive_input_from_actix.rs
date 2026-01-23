@@ -1,17 +1,9 @@
 use syn::{Ident, Token, parse::Parse};
 
+#[derive(Default)]
 pub struct QueryArgs {
     pub query_keys: Vec<syn::LitStr>,
     pub query_map: Option<syn::Expr>,
-}
-
-impl Default for QueryArgs {
-    fn default() -> Self {
-        Self {
-            query_keys: vec![],
-            query_map: None,
-        }
-    }
 }
 
 impl Parse for QueryArgs {

@@ -4,7 +4,7 @@ use proc_macro2::Span;
 use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
-use crate::{derive_endpoint::EndpointArgs, derive_input_from_actix::QueryArgs};
+use crate::{derive_endpoint::EndpointArgs, derive_input_from_actix::ArgumentGetter};
 
 mod derive_endpoint;
 mod derive_getters;
@@ -153,30 +153,30 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
                 break;
             }
         }
-        let args: QueryArgs = args.unwrap_or_default();
-        
-        if !args.query_keys.is_empty()
-        quote! { None, }.to_tokens(&mut token_data_tuple);
+        let args: ArgumentGetter = args.unwrap_or_default();
 
+        if !args.query_keys.is_empty() {
+            quote! { None, }.to_tokens(&mut token_data_tuple);
 
-        for (i, key) in args.query_keys.iter().enumerate() {
-            quote! { Some(#key) }.to_tokens(&mut inner_match);
-            if i != 0 {
-                quote! { | }.to_tokens(&mut inner_match);
-            }
-        }
-
-                quote! { => acc.#field_num = split.next() }.to_tokens(&mut inner_match);
-                if let Some(v) = args.map {
-                quote! { .map(#v) }.to_tokens(&mut inner_match);
+            for (i, key) in args.query_keys.iter().enumerate() {
+                quote! { Some(#key) }.to_tokens(&mut inner_match);
+                if i != 0 {
+                    quote! { | }.to_tokens(&mut inner_match);
                 }
-                quote! { , }.to_tokens(&mut inner_match);
+            }
+
+            quote! { => acc.#field_num = split.next() }.to_tokens(&mut inner_match);
+            if let Some(v) = args.query_map {
+                quote! { .map(#v) }.to_tokens(&mut inner_match);
+            }
+            quote! { , }.to_tokens(&mut inner_match);
         }
     }
 
     let return_data_parenthesized = match input_struct.fields {
         syn::Fields::Unit => unsafe { unreachable_unchecked() },
-        syn::Fields::Named(_) => quote! { { #return_data } }, syn::Fields::Unnamed(_) => quote! { ( #return_data ) },
+        syn::Fields::Named(_) => quote! { { #return_data } },
+        syn::Fields::Unnamed(_) => quote! { ( #return_data ) },
     };
 
     quote! {
