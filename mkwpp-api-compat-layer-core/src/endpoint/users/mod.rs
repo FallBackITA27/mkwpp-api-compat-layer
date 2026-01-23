@@ -26,7 +26,7 @@ impl Scope for UsersScope {
 pub struct RegisterUser;
 
 #[derive(Default, Endpoint)]
-#[internal(path = "/register", input = UserLoginData, output = LoginUserOutput, scope = UsersScope)]
+#[internal(path = "/login", input = UserLoginData, output = LoginUserOutput, scope = UsersScope)]
 pub struct LoginUser;
 
 #[derive(GetId, GetCategory, GetSessionToken)]

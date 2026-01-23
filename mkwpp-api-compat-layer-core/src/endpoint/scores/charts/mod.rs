@@ -21,13 +21,13 @@ pub struct GetCharts;
 #[derive(GetId, GetSessionToken, GetCategory)]
 pub struct GetChartsInput {
     #[internal(id)]
-    id: i32,
+    pub id: i32,
     #[internal(category)]
-    category: Category,
-    is_lap: bool,
-    max_date: UtcTimestamp,
-    region_id: i32,
-    limit: Limit,
+    pub category: Category,
+    pub is_lap: bool,
+    pub max_date: UtcTimestamp,
+    pub region_id: i32,
+    pub limit: Limit,
 }
 
 #[derive(Default, Endpoint)]

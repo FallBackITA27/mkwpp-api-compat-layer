@@ -1,6 +1,8 @@
+use std::str::FromStr;
+
 use crate::{
-    common_types::{NoData, category::Category, limit::Limit},
-    endpoint::{regions::GetRegionsDescAncInput},
+    common_types::{NoData, UtcTimestamp, category::Category, limit::Limit},
+    endpoint::{regions::GetRegionsDescAncInput, scores::charts::GetChartsInput},
     error::{ErrorCodes, FinalErrorResponse},
     status_code::StatusCode,
 };
@@ -64,7 +66,7 @@ impl InputFromActix for Option<Limit> {
             .map(From::from)
             .next_back();
 
-        if category.is_some() {
+        if limit.is_some() {
             return Ok(limit);
         }
 
@@ -98,10 +100,48 @@ impl InputFromActix for GetRegionsDescAncInput {
         Ok(Self {
             id: match id {
                 Some(v) => v,
-                None => return Err(ErrorCodes::InvalidInput
-                    .into_final_error(None::<&str>, file!(), line!())
-                    .into_response(StatusCode::BadRequest)),
+                None => {
+                    return Err(ErrorCodes::InvalidInput
+                        .into_final_error(None::<&str>, file!(), line!())
+                        .into_response(StatusCode::BadRequest));
+                }
             },
+        })
+    }
+}
+
+impl InputFromActix for GetChartsInput {
+    // id: i32,
+    // category: Category,
+    // is_lap: bool,
+    // max_date: UtcTimestamp,
+    // region_id: i32,
+    // limit: Limit,
+    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+        let id = request.query_string().split(&['?', '&']).fold(
+            (None, None, None, None, None, None),
+            |mut acc, next| {
+                let mut split = next.split('=');
+                match split.next() {
+                    Some("id") => acc.0 = split.next().map(FromStr::<i32>::from_str).flatten(),
+                    Some("cat") => acc.1 = split.next(),
+                    Some("lap") => acc.2 = split.next(),
+                    Some("dat") => acc.3 = split.next(),
+                    Some("reg") => acc.4 = split.next(),
+                    Some("lim") => acc.5 = split.next(),
+                    _ => (),
+                };
+                acc
+            },
+        );
+
+        Ok(Self {
+            id: 9,
+            category: Category::Normal,
+            is_lap: false,
+            max_date: UtcTimestamp::from(10),
+            region_id: 0,
+            limit: Limit::from(10),
         })
     }
 }
