@@ -1,6 +1,5 @@
-use actix_web::{HttpRequest, HttpResponse, Route, web};
+use actix_web::{FromRequest, HttpResponse, Route, web};
 
-use super::from_input::InputFromActix;
 use crate::{
     common_data_traits::GetSessionToken,
     endpoint::Endpoint,
@@ -11,7 +10,7 @@ use crate::{
 
 pub trait ToActixRoute: Endpoint
 where
-    Self::InputStruct: InputFromActix,
+    Self::InputStruct: FromRequest + 'static,
     Self::OutputStruct: serde::Serialize,
 {
     /// Only call this once, please.
@@ -20,11 +19,9 @@ where
     ) -> Route {
         let handler = std::sync::Arc::new(handler);
 
-        let inner_handler = move |mut req: HttpRequest| {
+        let inner_handler = move |input: Self::InputStruct| {
             let handler = handler.clone();
             async move {
-                let input = Self::InputStruct::get_from_request(&mut req)?;
-
                 if Self::REQUIRED_PERMISSION == RequiredPermission::None
                     && !Self::InputStruct::HAS_SESSION_TOKEN
                 {
@@ -47,7 +44,7 @@ where
 impl<T> ToActixRoute for T
 where
     T: Endpoint,
-    T::InputStruct: InputFromActix,
+    Self::InputStruct: FromRequest + 'static,
     T::OutputStruct: serde::Serialize,
 {
 }

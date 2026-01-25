@@ -6,20 +6,20 @@ use crate::{
     error::{ErrorCodes, FinalErrorResponse},
     status_code::StatusCode,
 };
-use actix_web::HttpRequest;
+use actix_web::{HttpRequest, web};
 
 pub trait InputFromActix: Sized {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse>;
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse>;
 }
 
 impl InputFromActix for NoData {
-    fn get_from_request(_: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+    fn get_from_request(_: &mut HttpRequest, _: web::Bytes) -> Result<Self, FinalErrorResponse> {
         Ok(NoData)
     }
 }
 
 impl InputFromActix for Option<Category> {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
         let category = request
             .query_string()
             .split(&['?', '&'])
@@ -45,13 +45,13 @@ impl InputFromActix for Option<Category> {
 }
 
 impl InputFromActix for Category {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
         <Option<Category>>::get_from_request(request).map(|v| v.unwrap_or_default())
     }
 }
 
 impl InputFromActix for Option<Limit> {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
         let limit = request
             .query_string()
             .split(&['?', '&'])
@@ -77,13 +77,13 @@ impl InputFromActix for Option<Limit> {
 }
 
 impl InputFromActix for Limit {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
-        <Option<Limit>>::get_from_request(request).map(|v| v.unwrap_or_default())
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
+        <Option<Limit>>::get_from_request(request, body).map(|v| v.unwrap_or_default())
     }
 }
 
 impl InputFromActix for GetRegionsDescAncInput {
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
         let id = request
             .query_string()
             .split(&['?', '&'])
@@ -117,31 +117,6 @@ impl InputFromActix for GetChartsInput {
     // max_date: UtcTimestamp,
     // region_id: i32,
     // limit: Limit,
-    fn get_from_request(request: &mut HttpRequest) -> Result<Self, FinalErrorResponse> {
-        let id = request.query_string().split(&['?', '&']).fold(
-            (None, None, None, None, None, None),
-            |mut acc, next| {
-                let mut split = next.split('=');
-                match split.next() {
-                    Some("id") => acc.0 = split.next().map(FromStr::<i32>::from_str).flatten(),
-                    Some("cat") => acc.1 = split.next(),
-                    Some("lap") => acc.2 = split.next(),
-                    Some("dat") => acc.3 = split.next(),
-                    Some("reg") => acc.4 = split.next(),
-                    Some("lim") => acc.5 = split.next(),
-                    _ => (),
-                };
-                acc
-            },
-        );
-
-        Ok(Self {
-            id: 9,
-            category: Category::Normal,
-            is_lap: false,
-            max_date: UtcTimestamp::from(10),
-            region_id: 0,
-            limit: Limit::from(10),
-        })
+    fn get_from_request(request: &mut HttpRequest, body: web::Bytes) -> Result<Self, FinalErrorResponse> {
     }
 }

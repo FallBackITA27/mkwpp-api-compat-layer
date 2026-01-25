@@ -1,4 +1,4 @@
-use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix};
 
 use crate::{
     common_types::{UtcTimestamp, category::Category, limit::Limit, scores::ScoresWithPlayer},
@@ -18,15 +18,24 @@ impl Scope for ChartsScope {
 #[internal(path = "/get", input = GetChartsInput, output = Vec<ScoresWithPlayer>, scope = ChartsScope)]
 pub struct GetCharts;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(GetId, GetSessionToken, GetCategory, InputFromActix)]
 pub struct GetChartsInput {
-    #[internal(id)]
+    #[internal(id, required)]
     pub id: i32,
-    #[internal(category)]
+
+    #[internal(category, key = "cat")]
     pub category: Category,
+
+    #[internal(key = "lap")]
     pub is_lap: bool,
+
+    #[internal(key = "dat")]
     pub max_date: UtcTimestamp,
+
+    #[internal(key = "reg")]
     pub region_id: i32,
+
+    #[internal(key = "lim")]
     pub limit: Limit,
 }
 

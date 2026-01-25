@@ -2,11 +2,10 @@ use proc_macro2::Span;
 use quote::quote;
 use syn::{Ident, parse_macro_input};
 
-use crate::utils::attribute_is_match;
+use crate::internal::{IsInternalAttribute, attribute_is_match};
 
-pub fn derive_getter(
+pub fn derive_getter<T: IsInternalAttribute<InnerType = syn::LitBool>>(
     input: proc_macro::TokenStream,
-    attribute_name: &str,
     get_trait_name: Ident,
     has_trait_name: Ident,
     get_function_name: Ident,
@@ -22,7 +21,13 @@ pub fn derive_getter(
 
     for (field_number, field) in input_struct.fields.iter().enumerate() {
         for attr in field.attrs.iter() {
-            if attribute_is_match(attr, attribute_name) {
+            if T::attribute_is_match_deep(attr)
+                && attr
+                    .parse_args::<T>()
+                    .expect("Failed to parse syntax")
+                    .get_inner()
+                    .value
+            {
                 out_ident = Some(match &field.ident {
                     Some(v) => Some(v.clone()),
                     None => Some(Ident::new(

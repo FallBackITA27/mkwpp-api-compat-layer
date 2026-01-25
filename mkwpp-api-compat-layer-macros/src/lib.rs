@@ -4,19 +4,22 @@ use proc_macro2::Span;
 use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
-use crate::{derive_endpoint::EndpointArgs, derive_input_from_actix::ArgumentGetter};
+use crate::{
+    derive_endpoint::EndpointArgs,
+    derive_input_from_actix::ArgumentGetter,
+    internal::{FieldIsCategory, FieldIsId, FieldIsSessionToken},
+};
 
 mod derive_endpoint;
 mod derive_getters;
 mod derive_input_from_actix;
+mod internal;
 mod to_scope;
-mod utils;
 
 #[proc_macro_derive(GetId, attributes(internal))]
 pub fn derive_get_id(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_getters::derive_getter(
+    derive_getters::derive_getter::<FieldIsId>(
         input,
-        "id",
         Ident::new("GetId", Span::call_site()),
         Ident::new("HasId", Span::call_site()),
         Ident::new("get_id", Span::call_site()),
@@ -27,9 +30,8 @@ pub fn derive_get_id(input: proc_macro::TokenStream) -> proc_macro::TokenStream 
 
 #[proc_macro_derive(GetCategory, attributes(internal))]
 pub fn derive_get_category(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_getters::derive_getter(
+    derive_getters::derive_getter::<FieldIsCategory>(
         input,
-        "category",
         Ident::new("GetCategory", Span::call_site()),
         Ident::new("HasCategory", Span::call_site()),
         Ident::new("get_category", Span::call_site()),
@@ -40,9 +42,8 @@ pub fn derive_get_category(input: proc_macro::TokenStream) -> proc_macro::TokenS
 
 #[proc_macro_derive(GetSessionToken, attributes(internal))]
 pub fn derive_get_session_token(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_getters::derive_getter(
+    derive_getters::derive_getter::<FieldIsSessionToken>(
         input,
-        "session_token",
         Ident::new("GetSessionToken", Span::call_site()),
         Ident::new("HasSessionToken", Span::call_site()),
         Ident::new("get_session_token", Span::call_site()),
@@ -58,7 +59,7 @@ pub fn derive_endpoint(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
     let mut args = EndpointArgs::default();
 
     for attr in &input_struct.attrs {
-        if utils::attribute_is_internal(attr) {
+        if internal::attribute_is_internal(attr) {
             args = attr.parse_args().expect("Couldn't parse args");
             break;
         }
@@ -66,14 +67,14 @@ pub fn derive_endpoint(input: proc_macro::TokenStream) -> proc_macro::TokenStrea
 
     let struct_name = input_struct.ident;
     let str_path = match args.str_path {
-        Some(v) => v,
+        Some(v) => v.0,
         None => panic!("Attribute `path` not set, required"),
     };
-    let request_method = args.request_method;
-    let required_permission = args.required_permission;
-    let input_struct_name = args.input_struct_name;
-    let output_struct_name = args.output_struct_name;
-    let scope_struct_name = args.scope_struct_name;
+    let request_method = args.request_method.0;
+    let required_permission = args.required_permission.0;
+    let input_struct_name = args.input_struct_name.0;
+    let output_struct_name = args.output_struct_name.0;
+    let scope_struct_name = args.scope_struct_name.0;
 
     quote! {
         #[automatically_derived]
@@ -133,9 +134,12 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
 
     let mut return_data = match input_struct.fields{
         syn::Fields::Unit => return quote! {
-            impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-                fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
-                    Ok(Self)
+            impl actix_web::FromRequest for #struct_name {
+                type Error = Infallible;
+                type Future = ::core::future::Ready<Result<Self, Self::Error>>;
+
+                fn from_request(_req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
+                    ::core::future::ready(Ok(Self))
                 }
             }
         }.into(),
@@ -148,7 +152,7 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
     for (field_num, field) in input_struct.fields.iter().enumerate() {
         let mut args = None;
         for attr in &field.attrs {
-            if utils::attribute_is_internal(attr) {
+            if internal::attribute_is_internal(attr) {
                 args = Some(attr.parse_args().expect("Couldn't parse args"));
                 break;
             }
@@ -157,8 +161,10 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
 
         if args.derive {
             match &field.ident {
-                Some(v) => quote! { #v: InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
-                None => quote! { InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
+                Some(v) => quote! { #v: InputFromActix::get_from_request(request)?, }
+                    .to_tokens(&mut return_data),
+                None => quote! { InputFromActix::get_from_request(request)?, }
+                    .to_tokens(&mut return_data),
             }
             continue;
         }
@@ -184,8 +190,6 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
                 None => quote! { data.#field_num, }.to_tokens(&mut return_data),
             }
         }
-
-
     }
 
     let return_data_parenthesized = match input_struct.fields {
@@ -195,8 +199,11 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
     };
 
     quote! {
-        impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-            fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
+        impl actix_web::FromRequest for #struct_name {
+                type Error = crate::error::FinalErrorResponse;
+                type Future = ::core::future::Ready<Result<Self, Self::Error>>;
+
+                fn from_request(_req: &actix_web::HttpRequest, _payload: &mut actix_web::dev::Payload) -> Self::Future {
                 let data = request.query_string().split(&['?', '&']).fold(
                     ( #token_data_tuple ),
                     |mut acc, next| {

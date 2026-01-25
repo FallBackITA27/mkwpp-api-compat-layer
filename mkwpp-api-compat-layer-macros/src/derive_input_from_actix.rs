@@ -1,10 +1,17 @@
+use proc_macro2::Span;
 use syn::{Ident, Token, parse::Parse};
 
-#[derive(Default)]
+use crate::internal::{FieldKey, FieldRequired, IsInternalAttribute};
+
 pub struct ArgumentGetter {
-    pub query_keys: Vec<syn::LitStr>,
-    pub query_map: Option<syn::Expr>,
-    pub derive: bool
+    pub query_keys: Vec<FieldKey>,
+    pub required: FieldRequired,
+}
+
+impl Default for ArgumentGetter {
+    fn default() -> Self {
+        Self { query_keys: vec![], required: FieldRequired(syn::LitBool::new(false, Span::call_site())) }
+    }
 }
 
 impl Parse for ArgumentGetter {
@@ -17,12 +24,9 @@ impl Parse for ArgumentGetter {
 
             let key = input.parse::<Ident>()?.to_string();
 
-            let _ = input.parse::<Token![=]>()?;
-
             match key.as_str() {
-                "derive" => out.derive = input.parse::<syn::LitBool>()?.value,
-                "key" => out.query_keys.push(input.parse()?),
-                "map" => out.query_map = Some(input.parse()?),
+                FieldRequired::NAME => out.required = input.parse()?,
+                FieldKey::NAME => out.query_keys.push(input.parse()?),
                 _ => (),
             }
 
