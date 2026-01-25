@@ -155,6 +155,14 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
         }
         let args: ArgumentGetter = args.unwrap_or_default();
 
+        if args.derive {
+            match &field.ident {
+                Some(v) => quote! { #v: InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
+                None => quote! { InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
+            }
+            continue;
+        }
+
         if !args.query_keys.is_empty() {
             quote! { None, }.to_tokens(&mut token_data_tuple);
 
@@ -170,7 +178,14 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
                 quote! { .map(#v) }.to_tokens(&mut inner_match);
             }
             quote! { , }.to_tokens(&mut inner_match);
+
+            match &field.ident {
+                Some(v) => quote! { #v: data.#field_num, }.to_tokens(&mut return_data),
+                None => quote! { data.#field_num, }.to_tokens(&mut return_data),
+            }
         }
+
+
     }
 
     let return_data_parenthesized = match input_struct.fields {
