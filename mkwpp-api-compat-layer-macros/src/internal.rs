@@ -315,6 +315,29 @@ impl From<syn::LitBool> for FieldIsSessionToken {
     }
 }
 
+pub struct FieldDerived(pub syn::LitBool);
+impl IsInternalAttribute for FieldDerived {
+    const NAME: &'static str = "derived";
+    const OPT_EQ_SIGN: bool = true;
+
+    fn get_inner(self) -> Self::InnerType {
+        self.0
+    }
+
+    type InnerType = syn::LitBool;
+}
+impl Parse for FieldDerived {
+    fn parse(input: syn::parse::ParseStream) -> syn::Result<Self> {
+        parse_internal_attribute_in_loop(input)
+    }
+}
+impl From<syn::LitBool> for FieldDerived {
+    fn from(value: syn::LitBool) -> Self {
+        Self(value)
+    }
+}
+
+
 pub struct FieldRequired(pub syn::LitBool);
 impl IsInternalAttribute for FieldRequired {
     const NAME: &'static str = "required";

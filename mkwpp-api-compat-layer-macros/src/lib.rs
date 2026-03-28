@@ -5,9 +5,7 @@ use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
 use crate::{
-    derive_endpoint::EndpointArgs,
-    derive_input_from_actix::ArgumentGetter,
-    internal::{FieldIsCategory, FieldIsId, FieldIsSessionToken},
+    derive_endpoint::EndpointArgs, derive_input_from_actix::InputFromActixFieldArgs, internal::{FieldIsCategory, FieldIsId, FieldIsSessionToken}
 };
 
 mod derive_endpoint;
@@ -157,9 +155,9 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
                 break;
             }
         }
-        let args: ArgumentGetter = args.unwrap_or_default();
+        let args: InputFromActixFieldArgs = args.unwrap_or_default();
 
-        if args.derive {
+        if args.derived.0.value {
             match &field.ident {
                 Some(v) => quote! { #v: InputFromActix::get_from_request(request)?, }
                     .to_tokens(&mut return_data),
@@ -173,6 +171,7 @@ pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::To
             quote! { None, }.to_tokens(&mut token_data_tuple);
 
             for (i, key) in args.query_keys.iter().enumerate() {
+                let key = key.0;
                 quote! { Some(#key) }.to_tokens(&mut inner_match);
                 if i != 0 {
                     quote! { | }.to_tokens(&mut inner_match);
