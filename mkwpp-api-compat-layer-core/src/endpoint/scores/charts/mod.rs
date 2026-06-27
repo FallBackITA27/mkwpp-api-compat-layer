@@ -18,7 +18,7 @@ impl Scope for ChartsScope {
 #[internal(path = "/get", input = GetChartsInput, output = Vec<ScoresWithPlayer>, scope = ChartsScope)]
 pub struct GetCharts;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetChartsInput {
     #[internal(id)]
     pub id: i32,
@@ -34,7 +34,7 @@ pub struct GetChartsInput {
 #[internal(path = "/get_dates", input = GetChartsDatesInput, output = Vec<UtcTimestamp>, scope = ChartsScope)]
 pub struct GetChartsDates;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetChartsDatesInput {
     #[internal(id)]
     id: i32,

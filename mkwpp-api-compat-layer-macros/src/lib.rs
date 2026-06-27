@@ -1,14 +1,11 @@
-use std::hint::unreachable_unchecked;
-
 use proc_macro2::Span;
 use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
-use crate::{derive_endpoint::EndpointArgs, derive_input_from_actix::ArgumentGetter};
+use crate::{derive_endpoint::EndpointArgs};
 
 mod derive_endpoint;
 mod derive_getters;
-mod derive_input_from_actix;
 mod to_scope;
 mod utils;
 
@@ -124,95 +121,6 @@ pub fn derive_frominto_inner(input: proc_macro::TokenStream) -> proc_macro::Toke
         }
     }
     .into()
-}
-
-#[proc_macro_derive(InputFromActix)]
-pub fn derive_input_from_actix(input: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let input_struct = parse_macro_input!(input as syn::ItemStruct);
-    let struct_name = input_struct.ident;
-
-    let mut return_data = match input_struct.fields{
-        syn::Fields::Unit => return quote! {
-            impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-                fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
-                    Ok(Self)
-                }
-            }
-        }.into(),
-        syn::Fields::Named(_) | syn::Fields::Unnamed(_) => proc_macro2::TokenStream::new(),
-    };
-
-    let mut token_data_tuple = proc_macro2::TokenStream::new();
-    let mut inner_match = proc_macro2::TokenStream::new();
-
-    for (field_num, field) in input_struct.fields.iter().enumerate() {
-        let mut args = None;
-        for attr in &field.attrs {
-            if utils::attribute_is_internal(attr) {
-                args = Some(attr.parse_args().expect("Couldn't parse args"));
-                break;
-            }
-        }
-        let args: ArgumentGetter = args.unwrap_or_default();
-
-        if args.derive {
-            match &field.ident {
-                Some(v) => quote! { #v: InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
-                None => quote! { InputFromActix::get_from_request(request)?, }.to_tokens(&mut return_data),
-            }
-            continue;
-        }
-
-        if !args.query_keys.is_empty() {
-            quote! { None, }.to_tokens(&mut token_data_tuple);
-
-            for (i, key) in args.query_keys.iter().enumerate() {
-                quote! { Some(#key) }.to_tokens(&mut inner_match);
-                if i != 0 {
-                    quote! { | }.to_tokens(&mut inner_match);
-                }
-            }
-
-            quote! { => acc.#field_num = split.next() }.to_tokens(&mut inner_match);
-            if let Some(v) = args.query_map {
-                quote! { .map(#v) }.to_tokens(&mut inner_match);
-            }
-            quote! { , }.to_tokens(&mut inner_match);
-
-            match &field.ident {
-                Some(v) => quote! { #v: data.#field_num, }.to_tokens(&mut return_data),
-                None => quote! { data.#field_num, }.to_tokens(&mut return_data),
-            }
-        }
-
-
-    }
-
-    let return_data_parenthesized = match input_struct.fields {
-        syn::Fields::Unit => unsafe { unreachable_unchecked() },
-        syn::Fields::Named(_) => quote! { { #return_data } },
-        syn::Fields::Unnamed(_) => quote! { ( #return_data ) },
-    };
-
-    quote! {
-        impl crate::compatibility_layer::rust_actix::from_input::InputFromActix for #struct_name {
-            fn get_from_request(request: &mut actix_web::HttpRequest) -> Result<Self, crate::error::FinalErrorResponse> {
-                let data = request.query_string().split(&['?', '&']).fold(
-                    ( #token_data_tuple ),
-                    |mut acc, next| {
-                        let mut split = next.split('=');
-                        match split.next() {
-                            #inner_match
-                            _ => (),
-                        };
-                        acc
-                    },
-                );
-
-                Ok(Self #return_data_parenthesized )
-            };
-        }
-    }.into()
 }
 
 #[proc_macro]

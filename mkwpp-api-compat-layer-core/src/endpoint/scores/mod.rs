@@ -27,7 +27,7 @@ impl Scope for ScoresScope {
 #[internal(path = "/recent", input = GetRecentScoresInput, output = Vec<ScoresByDate>, scope = ScoresScope)]
 pub struct GetRecentScores;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetRecentScoresInput {
     pub world_records: bool,
     pub limit: Limit,
@@ -37,7 +37,7 @@ pub struct GetRecentScoresInput {
 #[internal(path = "/records", input = GetRecordsInput, output = Vec<ScoresWithPlayer>, scope = ScoresScope)]
 pub struct GetRecords;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetRecordsInput {
     #[internal(id)]
     pub track_id: i32,

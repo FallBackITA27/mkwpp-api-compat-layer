@@ -1,5 +1,5 @@
 use mkwpp_api_compat_layer_macros::FromIntoInner;
-use serde::de::Visitor;
+use serde::{Deserialize, Serialize, de::Visitor};
 
 pub mod category;
 pub mod lap_mode;
@@ -66,3 +66,19 @@ impl<'de> serde::Deserialize<'de> for ChadsoftID {
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct NoData;
+
+impl<'de> Deserialize<'de> for NoData {
+fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
+    where
+        D: serde::Deserializer<'de> {
+    Ok(NoData)
+}
+}
+
+impl Serialize for NoData {
+    fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
+        where
+            S: serde::Serializer {
+                serializer.serialize_unit()
+    }
+}

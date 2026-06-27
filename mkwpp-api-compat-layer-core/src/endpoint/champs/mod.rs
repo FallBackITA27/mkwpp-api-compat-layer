@@ -1,5 +1,5 @@
 use mkwpp_api_compat_layer_macros::{
-    Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix,
+    Endpoint, GetCategory, GetId, GetSessionToken,
 };
 
 use crate::{
@@ -22,7 +22,7 @@ impl Scope for ChampsScope {
 pub struct GetChamps;
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[derive(GetId, GetSessionToken, InputFromActix)]
+#[derive(serde::Deserialize, GetId, GetSessionToken)]
 pub struct GetChampsFilters {
     #[wasm_bindgen(readonly)]
     pub(crate) category: Option<Category>,

@@ -22,7 +22,7 @@ impl Scope for PlayersScope {
 #[internal(path = "/get", input = GetPlayersInput, output = GetPlayersOutput, scope = PlayersScope)]
 pub struct GetPlayers;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetPlayersInput {
     basic: bool,
     ids: Vec<i32>,
@@ -49,7 +49,7 @@ pub struct GetList;
 #[internal(path = "/update_bio", input = UpdateBioInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct UpdateBio;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UpdateBioInput {
     data: String,
     #[internal(session_token)]
@@ -61,7 +61,7 @@ pub struct UpdateBioInput {
 #[internal(path = "/update_alias", input = UpdateAliasInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct UpdateAlias;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UpdateAliasInput {
     data: String,
     #[internal(session_token)]
@@ -73,7 +73,7 @@ pub struct UpdateAliasInput {
 #[internal(path = "/update_pronouns", input = UpdatePronounsInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct UpdatePronouns;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UpdatePronounsInput {
     data: String,
     #[internal(session_token)]
@@ -85,7 +85,7 @@ pub struct UpdatePronounsInput {
 #[internal(path = "/get_submitters", input = UserIdentificationData, output = GetSubmittersOutput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct GetSubmitters;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetSubmittersOutput {
     player_ids: Vec<i32>,
     #[internal(session_token)]
@@ -97,7 +97,7 @@ pub struct GetSubmittersOutput {
 #[internal(path = "/get_submittees", input = UserIdentificationData, output = GetSubmitteesOutput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct GetSubmittees;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetSubmitteesOutput {
     player_ids: Vec<i32>,
     #[internal(session_token)]
@@ -109,7 +109,7 @@ pub struct GetSubmitteesOutput {
 #[internal(path = "/add_submitter", input = AddSubmitterInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct AddSubmitter;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize,GetId, GetCategory, GetSessionToken)]
 pub struct AddSubmitterInput {
     player_id: i32,
     #[internal(session_token)]
@@ -121,7 +121,7 @@ pub struct AddSubmitterInput {
 #[internal(path = "/remove_submitter", input = RemoveSubmitterInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct RemoveSubmitter;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize,GetId, GetCategory, GetSessionToken)]
 pub struct RemoveSubmitterInput {
     player_id: i32,
     #[internal(session_token)]
@@ -133,7 +133,7 @@ pub struct RemoveSubmitterInput {
 #[internal(path = "/set_submitters", input = SetSubmittersInput, scope = PlayersScope, required = RequiredPermission::LoggedIn)]
 pub struct SetSubmitters;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize,GetId, GetCategory, GetSessionToken)]
 pub struct SetSubmittersInput {
     player_ids: Vec<i32>,
     #[internal(session_token)]

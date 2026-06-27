@@ -1,18 +1,14 @@
 use crate::{
     common_types::{
-        category::Category,
-        lap_mode::LapMode,
-        players::PlayersBasic,
-        rankings::{
+        UtcTimestamp, category::Category, lap_mode::LapMode, players::PlayersBasic, rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,
-        },
+        }
     },
     endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
 };
 
-use actix_web::cookie::time::UtcOffset;
 use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 pub struct RankingsScope;
@@ -44,12 +40,12 @@ macro_rules! rankings_type {
     };
 }
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct RankingsInput {
     #[internal(category)]
     pub category: Category,
     pub lap_mode: LapMode,
-    pub date: UtcOffset,
+    pub date: UtcTimestamp,
     pub region_id: i32,
 }
 

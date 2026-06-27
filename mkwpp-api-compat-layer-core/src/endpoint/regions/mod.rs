@@ -24,7 +24,7 @@ pub struct GetRegionsWithPlayerCount;
 #[internal(path = "/get_descendants", input = GetRegionsDescAncInput, output = Vec<i32>, scope = RegionsScope)]
 pub struct GetRegionsDescendants;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetRegionsDescAncInput {
     #[internal(id)]
     pub id: i32,

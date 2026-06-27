@@ -1,5 +1,5 @@
 use mkwpp_api_compat_layer_macros::{
-    Endpoint, GetCategory, GetId, GetSessionToken, InputFromActix,
+    Endpoint, GetCategory, GetId, GetSessionToken,
 };
 
 use crate::{
@@ -20,7 +20,7 @@ impl Scope for BlogScope {
 #[internal(path = "/get_list", input = GetBlogListInput, output = Vec<BlogPost>, scope = BlogScope)]
 pub struct GetBlogList;
 
-#[derive(GetId, GetCategory, GetSessionToken, InputFromActix)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct GetBlogListInput {
     filter: Limit,
 }
@@ -30,7 +30,7 @@ pub struct GetBlogListInput {
 #[internal(path = "/get_post", input = GetBlogPostInput, output = BlogPost, scope = BlogScope)]
 pub struct GetBlogPost;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize,GetId, GetCategory, GetSessionToken)]
 pub struct GetBlogPostInput {
     #[internal(id)]
     id: i32,

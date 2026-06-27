@@ -29,7 +29,7 @@ pub struct RegisterUser;
 #[internal(path = "/login", input = UserLoginData, output = LoginUserOutput, scope = UsersScope)]
 pub struct LoginUser;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct LoginUserOutput {
     #[internal(session_token)]
     session_token: String,
@@ -45,7 +45,7 @@ pub struct LogoutUser;
 #[internal(path = "/activate", input = ActivateUserInput, scope = UsersScope)]
 pub struct ActivateUser;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct ActivateUserInput {
     token: String,
 }
@@ -58,7 +58,7 @@ pub struct GetUser;
 #[internal(path = "/password_forgot", input = PasswordForgotInput, scope = UsersScope)]
 pub struct PasswordForgot;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordForgotInput {
     email: Email,
 }
@@ -67,7 +67,7 @@ pub struct PasswordForgotInput {
 #[internal(path = "/password_reset", input = PasswordResetInput, scope = UsersScope)]
 pub struct PasswordReset;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordResetInput {
     password: Password,
     token: String,
@@ -77,12 +77,12 @@ pub struct PasswordResetInput {
 #[internal(path = "/password_reset_token_check", input = PasswordResetTokenCheckInput, output = PasswordResetTokenCheckOutput, scope = UsersScope)]
 pub struct PasswordResetTokenCheck;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordResetTokenCheckInput {
     token: String,
 }
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordResetTokenCheckOutput {
     is_valid: bool,
 }

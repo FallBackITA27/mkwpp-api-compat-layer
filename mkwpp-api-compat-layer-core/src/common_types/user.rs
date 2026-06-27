@@ -2,13 +2,13 @@ use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::error::ErrorCodes;
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UserIdentificationData {
     #[internal(session_token)]
     session_token: String,
 }
 
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct ClientSideUserData {
     pub player_id: Option<i32>,
     pub user_id: i32,
@@ -23,14 +23,14 @@ pub struct ClientSideUserData {
         email: ()
     ]
 )]
-#[derive(GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UserRegisterData {
     username: Username,
     password: Password,
     email: either_field::either!(Email | ()),
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 pub struct Username(String);
 
 impl TryFrom<String> for Username {
@@ -50,7 +50,7 @@ impl From<Username> for String {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, serde::Deserialize)]
 pub struct Email(String);
 
 impl TryFrom<String> for Email {
@@ -77,7 +77,7 @@ impl From<Email> for String {
     }
 }
 
-#[derive(serde::Serialize)]
+#[derive(serde::Deserialize, serde::Serialize)]
 pub struct Password(String);
 
 impl TryFrom<String> for Password {

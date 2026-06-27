@@ -107,7 +107,7 @@ impl Scope {
 
         for endpoint in &self.child_endpoints {
             where_clauses.extend(quote! {
-                <#endpoint as Endpoint>::InputStruct: InputFromActix,
+                <#endpoint as Endpoint>::InputStruct: serde::de::DeserializeOwned,
                 <#endpoint as Endpoint>::OutputStruct: serde::Serialize,
             });
         }

@@ -27,6 +27,7 @@ impl Scope for TimesheetScope {
 #[internal(path = "/get", input = GetTimesheetInput, output = Timesheet, scope = TimesheetScope)]
 pub struct GetTimesheet;
 
+#[derive(serde::Serialize)]
 pub struct Timesheet {
     pub times: Vec<Times>,
     pub af: AverageFinish,
@@ -36,7 +37,7 @@ pub struct Timesheet {
     pub prwr: PersonalRecordWorldRecord,
 }
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetTimesheetInput {
     #[internal(id)]
     player_id: i32,
@@ -51,7 +52,7 @@ pub struct GetTimesheetInput {
 #[internal(path = "/linechart", input = GetLinechartInput, output = Vec<Scores>, scope = TimesheetScope)]
 pub struct GetLinechart;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetLinechartInput {
     #[internal(id)]
     player_id: i32,
@@ -65,7 +66,7 @@ pub struct GetLinechartInput {
 #[internal(path = "/matchup", input = GetMatchupInput, output = GetMatchupOutput, scope = TimesheetScope)]
 pub struct GetMatchup;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetMatchupInput {
     player_ids: Vec<i32>,
     #[internal(category)]
@@ -77,6 +78,7 @@ pub struct GetMatchupInput {
 }
 
 // TODO: Make all these vectors related and not need to index them.
+#[derive(serde::Serialize)]
 pub struct GetMatchupOutput {
     pub player_data: Vec<Timesheet>,
     pub wins: Vec<i8>,

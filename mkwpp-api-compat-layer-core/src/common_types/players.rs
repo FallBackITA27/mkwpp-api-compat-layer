@@ -37,8 +37,7 @@ use crate::common_types::{ChadsoftID, UtcTimestamp};
 #[serde_with::skip_serializing_none]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
-#[derive(Debug, Clone, GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, Debug, Clone, GetId, GetSessionToken, GetCategory)]
 #[serde(rename_all = "camelCase")]
 pub struct PlayersTemplate {
     #[internal(id)]

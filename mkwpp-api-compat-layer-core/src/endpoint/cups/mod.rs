@@ -18,10 +18,9 @@ impl Scope for CupsScope {
 #[internal(path = "/get", output = Vec<GetCupsOutput>, scope = CupsScope)]
 pub struct GetCups;
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
 pub struct GetCupsOutput {
     #[cfg_attr(feature = "typescript-wasm", wasm_bindgen(readonly))]
     #[internal(id)]
@@ -35,10 +34,10 @@ pub struct GetCupsOutput {
     pub track_ids: CupSlots,
 }
 
-#[derive(GetId, GetSessionToken, GetCategory)]
+#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize, Clone, Copy))]
+#[cfg_attr(feature = "typescript-wasm", derive(Clone, Copy))]
 pub struct CupSlots {
     #[cfg_attr(feature = "typescript-wasm", wasm_bindgen(readonly))]
     pub track_id_slot_1: i32,
