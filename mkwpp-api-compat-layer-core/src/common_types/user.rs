@@ -1,6 +1,6 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
-use crate::error::ErrorCodes;
+use crate::error::{ErrorCodes, PPResult};
 
 #[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UserIdentificationData {
@@ -23,24 +23,38 @@ pub struct ClientSideUserData {
         email: ()
     ]
 )]
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, Default, GetId, GetCategory, GetSessionToken)]
 pub struct UserRegisterData {
-    username: Username,
-    password: Password,
-    email: either_field::either!(Email | ()),
+    pub username: Username,
+    pub password: Password,
+    pub email: either_field::either!(Email | ()),
 }
 
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Username(String);
 
+impl Default for Username {
+fn default() -> Self {
+    Self(String::from("Unknown"))
+}
+}
+
+impl Username {
+    fn check_valid(&self) -> Result<(), ErrorCodes> {
+        match self.0.len() {
+            0..=3 => Err(ErrorCodes::UsernameTooShort),
+            151.. => Err(ErrorCodes::UsernameTooLong),
+            _ => Ok(()),
+        }
+    }
+}
+
 impl TryFrom<String> for Username {
     type Error = ErrorCodes;
     fn try_from(value: String) -> Result<Self, Self::Error> {
-        match value.len() {
-            0..=3 => Err(ErrorCodes::UsernameTooShort),
-            151.. => Err(ErrorCodes::UsernameTooLong),
-            _ => Ok(Self(value)),
-        }
+        let v = Self(value);
+        v.check_valid()?;
+        Ok(v)
     }
 }
 
@@ -53,9 +67,15 @@ impl From<Username> for String {
 #[derive(serde::Serialize, serde::Deserialize)]
 pub struct Email(String);
 
-impl TryFrom<String> for Email {
-    type Error = ErrorCodes;
-    fn try_from(value: String) -> Result<Self, Self::Error> {
+impl Default for Email {
+fn default() -> Self {
+    Self(String::from("unknown@gmail.com"))
+}
+}
+
+impl Email {
+    fn check_valid(&self) -> Result<(), ErrorCodes> {
+        let value = &self.0;
         if value.len() > 254 {
             return Err(ErrorCodes::EmailTooLong);
         }
@@ -64,10 +84,19 @@ impl TryFrom<String> for Email {
             r"^[a-zA-Z0-9.!#$%&'*+\/=?^_`{|}~-]+@[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?(?:\.[a-zA-Z0-9](?:[a-zA-Z0-9-]{0,61}[a-zA-Z0-9])?)*$"
         ).unwrap();
 
-        match regex_checker.is_match(&value) {
-            true => Ok(Self(value)),
+        match regex_checker.is_match(value) {
+            true => Ok(()),
             false => Err(ErrorCodes::EmailInvalid),
         }
+    }
+}
+
+impl TryFrom<String> for Email {
+    type Error = ErrorCodes;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let v = Email(value);
+        v.check_valid()?;
+        Ok(v)
     }
 }
 
@@ -80,9 +109,15 @@ impl From<Email> for String {
 #[derive(serde::Deserialize, serde::Serialize)]
 pub struct Password(String);
 
-impl TryFrom<String> for Password {
-    type Error = ErrorCodes;
-    fn try_from(value: String) -> Result<Self, Self::Error> {
+impl Default for Password {
+fn default() -> Self {
+    Self(String::from("AAAAaaaa!!!!1111"))
+}
+}
+
+impl Password {
+    fn check_valid(&self) -> Result<(), ErrorCodes> {
+        let value = &self.0;
         let value = match value.len() {
             0..=8 => return Err(ErrorCodes::PasswordTooShort),
             129.. => return Err(ErrorCodes::PasswordTooLong),
@@ -128,7 +163,16 @@ impl TryFrom<String> for Password {
             return Err(ErrorCodes::PasswordMustHaveNumber);
         }
 
-        Ok(Self(value))
+        Ok(())
+    }
+}
+
+impl TryFrom<String> for Password {
+    type Error = ErrorCodes;
+    fn try_from(value: String) -> Result<Self, Self::Error> {
+        let v = Password(value);
+        v.check_valid()?;
+        Ok(v)
     }
 }
 
