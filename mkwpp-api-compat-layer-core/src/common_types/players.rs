@@ -1,6 +1,6 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
-use crate::common_types::{ChadsoftID, UtcTimestamp};
+use crate::common_types::{ChadsoftID, utc_timestamp::UtcTimestamp};
 
 #[either_field::make_template(
     GenStructs: true,
@@ -35,6 +35,7 @@ use crate::common_types::{ChadsoftID, UtcTimestamp};
     ],
 )]
 #[serde_with::skip_serializing_none]
+#[derive(Default)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 #[derive(serde::Deserialize, Debug, Clone, GetId, GetSessionToken, GetCategory)]

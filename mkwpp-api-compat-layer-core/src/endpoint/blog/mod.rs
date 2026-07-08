@@ -1,9 +1,7 @@
-use mkwpp_api_compat_layer_macros::{
-    Endpoint, GetCategory, GetId, GetSessionToken,
-};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
-    common_types::{UtcTimestamp, limit::Limit},
+    common_types::{limit::Limit, utc_timestamp::UtcTimestamp},
     endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
@@ -20,9 +18,9 @@ impl Scope for BlogScope {
 #[internal(path = "/get_list", input = GetBlogListInput, output = Vec<BlogPost>, scope = BlogScope)]
 pub struct GetBlogList;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct GetBlogListInput {
-    filter: Limit,
+    pub filter: Limit,
 }
 
 #[derive(Default, Endpoint)]
@@ -30,13 +28,13 @@ pub struct GetBlogListInput {
 #[internal(path = "/get_post", input = GetBlogPostInput, output = BlogPost, scope = BlogScope)]
 pub struct GetBlogPost;
 
-#[derive(serde::Deserialize,GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct GetBlogPostInput {
     #[internal(id)]
     id: i32,
 }
 
-#[derive(Debug, Clone, GetId, GetSessionToken, GetCategory)]
+#[derive(Debug, Clone, GetId, GetSessionToken, GetCategory, Default)]
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 #[cfg_attr(feature = "typescript-wasm", derive(serde::Deserialize))]
@@ -59,6 +57,7 @@ pub struct BlogPost {
     #[wasm_bindgen(readonly)]
     pub published_at: UtcTimestamp,
 
+    // TODO: make Author (player) ID enforced, and make AuthorId/Username/None enum
     #[wasm_bindgen(readonly)]
     pub author_id: Option<i32>,
 

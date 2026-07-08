@@ -1,8 +1,13 @@
 use crate::{
     common_types::{
-        UtcTimestamp, category::Category, lap_mode::LapMode, players::PlayersBasic, rankings::{
+        category::Category,
+        lap_mode::LapMode,
+        players::PlayersBasic,
+        rankings::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,
-        }
+        },
+        regions::RegionType,
+        utc_timestamp::UtcTimestamp,
     },
     endpoint::{Root, Scope},
     request_method::RequestMethod,
@@ -30,7 +35,7 @@ macro_rules! rankings_type {
         #[internal(path = $endpoint, input = RankingsInput, output = Vec<$output_struct_name>, scope = RankingsScope)]
         pub struct $struct_name;
 
-        #[derive(GetId, GetCategory, GetSessionToken)]
+        #[derive(GetId, GetCategory, GetSessionToken, Default)]
         #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
         pub struct $output_struct_name {
             pub rank: i32,
@@ -40,7 +45,7 @@ macro_rules! rankings_type {
     };
 }
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct RankingsInput {
     #[internal(category)]
     pub category: Category,
@@ -57,13 +62,22 @@ rankings_type!(PersonalRecordWorldRecord);
 
 #[derive(Default, Endpoint)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[internal(path = "/get_country", input = RankingsInput, output = Vec<GetCountryRankingsOutput>, scope = RankingsScope)]
+#[internal(path = "/get_country", input = GetCountryRankingsInput, output = Vec<GetCountryRankingsOutput>, scope = RankingsScope)]
 pub struct GetCountryRankings;
+
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
+pub struct GetCountryRankingsInput {
+    #[internal(category)]
+    pub category: Category,
+    pub lap_mode: LapMode,
+    pub date: UtcTimestamp,
+    pub region_type: RegionType,
+}
 
 #[cfg_attr(feature = "rust-actix", derive(serde::Serialize))]
 #[derive(GetId, GetCategory, GetSessionToken)]
 pub struct GetCountryRankingsOutput {
-    pub region_id: AverageFinish,
+    pub region_id: i32,
     pub rank: i32,
-    pub value: f64,
+    pub value: AverageFinish,
 }

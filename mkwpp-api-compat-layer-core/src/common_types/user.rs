@@ -2,7 +2,7 @@ use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 
 use crate::error::ErrorCodes;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
 pub struct UserIdentificationData {
     #[internal(session_token)]
     session_token: String,

@@ -1,10 +1,8 @@
-use mkwpp_api_compat_layer_macros::{
-    Endpoint, GetCategory, GetId, GetSessionToken,
-};
+use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToken};
 
 use crate::{
     common_data_traits::GetCategory,
-    common_types::{UtcTimestamp, category::Category},
+    common_types::{category::Category, utc_timestamp::UtcTimestamp},
     endpoint::{Root, Scope},
     request_method::RequestMethod,
     required_permission::RequiredPermission,
@@ -31,6 +29,14 @@ pub struct GetChampsFilters {
 impl GetCategory for GetChampsFilters {
     fn get_category(&self) -> Category {
         self.category.unwrap_or(Category::Normal)
+    }
+}
+
+impl Default for GetChampsFilters {
+    fn default() -> Self {
+        Self {
+            category: Some(Category::Normal),
+        }
     }
 }
 

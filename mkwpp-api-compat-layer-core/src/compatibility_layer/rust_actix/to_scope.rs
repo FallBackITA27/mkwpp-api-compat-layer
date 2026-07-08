@@ -6,8 +6,9 @@ use crate::{
         champs::{ChampsScope, GetChamps},
         cups::{CupsScope, GetCups},
         players::{
-            AddSubmitter, GetList, GetPlayers, GetSubmittees, GetSubmitters, PlayersScope,
-            RemoveSubmitter, SetSubmitters, UpdateAlias, UpdateBio, UpdatePronouns,
+            AddSubmitter, AdminPlayerDelete, AdminPlayerEdit, AdminPlayerInsert,
+            GetAdminPlayerList, GetPlayers, GetPlayersList, GetSubmittees, GetSubmitters,
+            PlayersScope, RemoveSubmitter, SetSubmitters, UpdateAlias, UpdateBio, UpdatePronouns,
         },
         rankings::{
             GetAverageFinish, GetAverageRankRating, GetCountryRankings,
@@ -15,9 +16,11 @@ use crate::{
         },
         regions::{
             GetRegionsAncestors, GetRegionsChildrenTree, GetRegionsDescendants,
-            GetRegionsTypeHashmap, GetRegionsWithPlayerCount, RegionsScope,
+            GetRegionsTypeHashmap, GetRegionsWithPlayerCount, RegionsAdminDelete, RegionsAdminEdit,
+            RegionsAdminInsert, RegionsScope,
         },
         scores::{
+            AdminScoreDelete, AdminScoreEdit, AdminScoreInsert, GetAdminScore, GetAdminScoreList,
             GetRecentScores, GetRecords, ScoresScope,
             charts::{ChartsScope, GetCharts, GetChartsDates},
             timesheet::{GetLinechart, GetMatchup, GetTimesheet, TimesheetScope},
@@ -26,11 +29,13 @@ use crate::{
         standards::{GetStandards, StandardsScope},
         submissions::{
             CreateEditSubmission, CreateSubmission, EditEditSubmission, EditSubmission,
-            GetEditSubmissionsList, GetSubmissionsList, SubmissionsScope,
+            EditSubmissionDelete, GetEditSubmissionsList, GetSubmissionsList, SubmissionDelete,
+            SubmissionsScope,
         },
         tracks::{GetTracks, TracksScope},
         users::{
-            ActivateUser, GetUser, LoginUser, LogoutUser, PasswordForgot, PasswordReset,
+            ActivateUser, AdminUserDelete, AdminUserEdit, AdminUserInsert, GetAdminUserList,
+            GetUser, IsAdmin, LoginUser, LogoutUser, PasswordForgot, PasswordReset,
             PasswordResetTokenCheck, RegisterUser, UsersScope,
         },
     },
@@ -51,14 +56,17 @@ mkwpp_api_compat_layer_macros::to_scope!(
             GetRegionsAncestors,
             GetRegionsDescendants,
             GetRegionsTypeHashmap,
-            GetRegionsChildrenTree
+            GetRegionsChildrenTree,
+            RegionsAdminEdit, RegionsAdminDelete, RegionsAdminInsert
         ],
         BlogScope: [ GetBlogList, GetBlogPost ],
         PlayersScope: [
-            AddSubmitter, GetList, GetPlayers,
+            AddSubmitter, GetPlayersList, GetPlayers,
             GetSubmittees, GetSubmitters,
             RemoveSubmitter, SetSubmitters,
-            UpdateAlias, UpdateBio, UpdatePronouns
+            UpdateAlias, UpdateBio, UpdatePronouns,
+            GetAdminPlayerList,
+            AdminPlayerInsert, AdminPlayerEdit, AdminPlayerDelete
         ],
         RankingsScope: [
             GetAverageFinish,
@@ -74,15 +82,18 @@ mkwpp_api_compat_layer_macros::to_scope!(
             CreateSubmission,
             CreateEditSubmission,
             EditSubmission,
-            EditEditSubmission
+            EditEditSubmission,
+            EditSubmissionDelete, SubmissionDelete
         ],
         UsersScope: [
             ActivateUser, GetUser, LoginUser,
             LogoutUser, PasswordForgot, PasswordReset,
-            PasswordResetTokenCheck, RegisterUser
+            PasswordResetTokenCheck, RegisterUser, IsAdmin,
+            AdminUserEdit, AdminUserDelete, AdminUserInsert, GetAdminUserList
         ],
         ScoresScope: [
             GetRecentScores, GetRecords,
+            AdminScoreEdit, AdminScoreDelete, AdminScoreInsert, GetAdminScoreList, GetAdminScore,
             ChartsScope: [ GetCharts, GetChartsDates ],
             TimesheetScope: [ GetLinechart, GetMatchup, GetTimesheet ]
         ],

@@ -1,8 +1,9 @@
 use serde::de::Visitor;
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-#[derive(Debug, Clone, Copy)]
+#[derive(Debug, Clone, Copy, Default)]
 pub enum LapMode {
+    #[default]
     Course,
     FastLap,
     Overall,

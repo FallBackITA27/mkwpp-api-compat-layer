@@ -27,14 +27,16 @@ web-sys = { version = "0.3.77", optional = true, features = [
 ] }
 mkwpp-api-compat-layer-macros = { path="../mkwpp-api-compat-layer-macros" }
 regex = "1.12.2"
+chrono = {version="0.4.45", optional=true}
 
 [dev-dependencies]
 strum = { version = "*", features = ["derive"] }
 
 [features]
-default = ["rust-actix", "typescript-wasm"]
+default = ["rust-actix", "typescript-wasm", "chrono-conversion"]
 rust-actix = ["dep:actix-web"]
 typescript-wasm = ["dep:wasm-bindgen", "dep:wasm-bindgen-futures", "dep:js-sys", "dep:web-sys", "dep:serde-wasm-bindgen"]
+chrono-conversion = ["dep:chrono"]
 
 [lints]
 workspace = true

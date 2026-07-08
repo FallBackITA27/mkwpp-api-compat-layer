@@ -1,7 +1,7 @@
 use mkwpp_api_compat_layer_macros::{GetCategory, GetId, GetSessionToken};
 use serde::de::Visitor;
 
-use crate::common_types::{UtcTimestamp, category::Category};
+use crate::common_types::{category::Category, utc_timestamp::UtcTimestamp};
 
 #[derive(Debug, Default, PartialEq, Clone, Copy)]
 pub enum SubmissionStatus {
@@ -20,7 +20,7 @@ impl TryInto<SubmissionStatus> for u8 {
             1 => Ok(SubmissionStatus::Accepted),
             2 => Ok(SubmissionStatus::Rejected),
             3 => Ok(SubmissionStatus::OnHold),
-            3..=255 => Err(()),
+            _ => Err(()),
         }
     }
 }

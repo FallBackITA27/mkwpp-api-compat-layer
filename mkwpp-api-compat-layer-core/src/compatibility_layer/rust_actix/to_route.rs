@@ -22,16 +22,20 @@ where
         let inner_handler = move |req: HttpRequest, data: Option<web::Json<Self::InputStruct>>| {
             let handler = handler.clone();
             async move {
-                let input: Self::InputStruct = match serde_urlencoded::from_str(req.query_string()) {
+                let input: Self::InputStruct = match serde_urlencoded::from_str(req.query_string())
+                {
                     Ok(v) => v,
-                    Err(e1) => 
-                        match data {
-                            Some(v) => v.into_inner(),
-                            None => return Err(ErrorCodes::InvalidInput.into_final_error(Some(format!("{e1}")), file!(), line!()).into_response(StatusCode::BadRequest))
+                    Err(e1) => match data {
+                        Some(v) => v.into_inner(),
+                        None => {
+                            return Err(ErrorCodes::InvalidInput
+                                .into_final_error(Some(format!("{e1}")), file!(), line!())
+                                .into_response(StatusCode::BadRequest));
                         }
+                    },
                 };
-                
-                if Self::REQUIRED_PERMISSION == RequiredPermission::None
+
+                if Self::REQUIRED_PERMISSION != RequiredPermission::None
                     && !Self::InputStruct::HAS_SESSION_TOKEN
                 {
                     // If fail here then something is wrong in the endpoints

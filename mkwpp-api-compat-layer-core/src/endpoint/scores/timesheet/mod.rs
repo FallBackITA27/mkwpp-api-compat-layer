@@ -2,7 +2,6 @@ use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToke
 
 use crate::{
     common_types::{
-        UtcTimestamp,
         category::Category,
         lap_mode::LapMode,
         limit::Limit,
@@ -10,6 +9,7 @@ use crate::{
             AverageFinish, AverageRankRating, PersonalRecordWorldRecord, TallyPoints, TotalTime,
         },
         scores::{Scores, ScoresWithPlayer, Times},
+        utc_timestamp::UtcTimestamp,
     },
     endpoint::{RequiredPermission, Root, Scope, scores::ScoresScope},
     request_method::RequestMethod,
@@ -27,7 +27,7 @@ impl Scope for TimesheetScope {
 #[internal(path = "/get", input = GetTimesheetInput, output = Timesheet, scope = TimesheetScope)]
 pub struct GetTimesheet;
 
-#[derive(serde::Serialize)]
+#[derive(Default, serde::Serialize)]
 pub struct Timesheet {
     pub times: Vec<Times>,
     pub af: AverageFinish,
@@ -37,48 +37,48 @@ pub struct Timesheet {
     pub prwr: PersonalRecordWorldRecord,
 }
 
-#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
+#[derive(Default, serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetTimesheetInput {
     #[internal(id)]
-    player_id: i32,
+    pub player_id: i32,
     #[internal(category)]
-    category: Category,
-    lap_mode: LapMode,
-    max_date: UtcTimestamp,
-    region_id: i32,
+    pub category: Category,
+    pub lap_mode: LapMode,
+    pub max_date: UtcTimestamp,
+    pub region_id: i32,
 }
 
 #[derive(Default, Endpoint)]
 #[internal(path = "/linechart", input = GetLinechartInput, output = Vec<Scores>, scope = TimesheetScope)]
 pub struct GetLinechart;
 
-#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
+#[derive(Default, serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetLinechartInput {
     #[internal(id)]
-    player_id: i32,
+    pub player_id: i32,
     #[internal(category)]
-    category: Category,
-    track_id: i32,
-    is_lap: bool,
+    pub category: Category,
+    pub track_id: i32,
+    pub is_lap: bool,
 }
 
 #[derive(Default, Endpoint)]
 #[internal(path = "/matchup", input = GetMatchupInput, output = GetMatchupOutput, scope = TimesheetScope)]
 pub struct GetMatchup;
 
-#[derive(serde::Deserialize, GetId, GetSessionToken, GetCategory)]
+#[derive(Default, serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetMatchupInput {
-    player_ids: Vec<i32>,
+    pub player_ids: Vec<i32>,
     #[internal(category)]
-    category: Category,
-    lap_mode: LapMode,
-    is_lap: bool,
-    max_date: UtcTimestamp,
-    region_id: i32,
+    pub category: Category,
+    pub lap_mode: LapMode,
+    pub is_lap: bool,
+    pub max_date: UtcTimestamp,
+    pub region_id: i32,
 }
 
 // TODO: Make all these vectors related and not need to index them.
-#[derive(serde::Serialize)]
+#[derive(serde::Serialize, Default)]
 pub struct GetMatchupOutput {
     pub player_data: Vec<Timesheet>,
     pub wins: Vec<i8>,

@@ -10,12 +10,9 @@ pub mod regions;
 pub mod scores;
 pub mod submissions;
 pub mod user;
+pub mod utc_timestamp;
 
-#[derive(Debug, serde::Serialize, serde::Deserialize, Clone, Copy, FromIntoInner)]
-#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
-pub struct UtcTimestamp(f64);
-
-#[derive(Debug, Clone, Copy, FromIntoInner)]
+#[derive(Debug, Clone, Copy, FromIntoInner, Default)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub struct ChadsoftID(i64);
 
@@ -65,20 +62,29 @@ impl<'de> serde::Deserialize<'de> for ChadsoftID {
 }
 
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[derive(Default)]
 pub struct NoData;
 
 impl<'de> Deserialize<'de> for NoData {
-fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
+    fn deserialize<D>(_deserializer: D) -> Result<Self, D::Error>
     where
-        D: serde::Deserializer<'de> {
-    Ok(NoData)
-}
+        D: serde::Deserializer<'de>,
+    {
+        Ok(NoData)
+    }
 }
 
 impl Serialize for NoData {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where
-            S: serde::Serializer {
-                serializer.serialize_unit()
+    where
+        S: serde::Serializer,
+    {
+        serializer.serialize_unit()
+    }
+}
+
+impl From<u64> for NoData {
+    fn from(_value: u64) -> Self {
+        NoData
     }
 }

@@ -2,12 +2,12 @@ use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToke
 
 use crate::{
     common_types::{
-        UtcTimestamp,
         category::Category,
         user::{
             ClientSideUserData, Email, Password, UserIdentificationData, UserLoginData,
             UserRegisterData,
         },
+        utc_timestamp::UtcTimestamp,
     },
     endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
@@ -85,4 +85,91 @@ pub struct PasswordResetTokenCheckInput {
 #[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordResetTokenCheckOutput {
     is_valid: bool,
+}
+
+#[derive(Default, Endpoint)]
+#[internal(path = "/is_admin", input = IsAdminInput, output = bool, scope = UsersScope)]
+pub struct IsAdmin;
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct IsAdminInput {
+    #[internal(session_token)]
+    session_token: String,
+}
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/get_admin_user_list", input = GetAdminUserListInput, output = Vec<AdminUserView>, scope = UsersScope, required = RequiredPermission::Admin, request = RequestMethod::Post)]
+pub struct GetAdminUserList;
+
+#[derive(Default, serde::Serialize, GetId, GetCategory, GetSessionToken)]
+pub struct AdminUserView {
+    #[internal(id)]
+    id: i32,
+    pub username: String,
+    pub email: String,
+    pub is_superuser: bool,
+    pub is_staff: bool,
+    pub is_active: bool,
+    pub is_verified: bool,
+    pub player_id: Option<i32>,
+}
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct GetAdminUserListInput {
+    #[internal(id)]
+    user_id: i32,
+    #[internal(session_token)]
+    session_token: String,
+}
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/admin_user_insert", input = AdminUserInsertInput, scope = UsersScope, required = RequiredPermission::Admin, request = RequestMethod::Put)]
+pub struct AdminUserInsert;
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct AdminUserInsertInput {
+    pub username: String,
+    pub password: String,
+    pub email: String,
+    pub is_staff: bool,
+    pub is_active: bool,
+    pub is_verified: bool,
+    pub player_id: Option<i32>,
+    #[internal(session_token)]
+    pub session_token: String,
+}
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/admin_user_edit", input = AdminUserEditInput, scope = UsersScope, required = RequiredPermission::Admin, request = RequestMethod::Patch)]
+pub struct AdminUserEdit;
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct AdminUserEditInput {
+    #[internal(id)]
+    pub id: i32,
+    pub username: String,
+    pub password: String,
+    pub email: String,
+    pub is_staff: bool,
+    pub is_active: bool,
+    pub is_verified: bool,
+    pub player_id: Option<i32>,
+    #[internal(session_token)]
+    pub session_token: String,
+}
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/admin_user_delete", input = AdminUserDeleteInput, scope = UsersScope, required = RequiredPermission::Admin, request = RequestMethod::Delete)]
+pub struct AdminUserDelete;
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct AdminUserDeleteInput {
+    #[internal(id)]
+    id: i32,
+    #[internal(session_token)]
+    session_token: String,
 }

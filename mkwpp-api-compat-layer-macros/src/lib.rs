@@ -2,7 +2,7 @@ use proc_macro2::Span;
 use quote::{ToTokens, quote};
 use syn::{Ident, parse::Parse, parse_macro_input};
 
-use crate::{derive_endpoint::EndpointArgs};
+use crate::derive_endpoint::EndpointArgs;
 
 mod derive_endpoint;
 mod derive_getters;

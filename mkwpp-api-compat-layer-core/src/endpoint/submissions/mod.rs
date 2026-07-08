@@ -2,10 +2,10 @@ use mkwpp_api_compat_layer_macros::{Endpoint, GetCategory, GetId, GetSessionToke
 
 use crate::{
     common_types::{
-        UtcTimestamp,
         category::Category,
         submissions::{EditSubmissions, SubmissionStatus, Submissions},
         user::UserIdentificationData,
+        utc_timestamp::UtcTimestamp,
     },
     endpoint::{RequiredPermission, Root, Scope},
     request_method::RequestMethod,
@@ -23,8 +23,15 @@ impl Scope for SubmissionsScope {
 #[internal(path = "/get_list", input = UserIdentificationData, output = Vec<Submissions>, scope = SubmissionsScope, required = RequiredPermission::LoggedIn)]
 pub struct GetSubmissionsList;
 
+#[derive(Default, serde::Deserialize, GetId, GetSessionToken, GetCategory)]
+pub struct GetSubmissionListInput {
+    pub full_list: bool, // Note: Only allow if logged in, TODO: Enforce with type system
+    #[internal(session_token)]
+    pub session_token: String,
+}
+
 #[derive(Default, Endpoint)]
-#[internal(path = "/get_edit_list", input = UserIdentificationData, output = Vec<EditSubmissions>, scope = SubmissionsScope, required = RequiredPermission::LoggedIn)]
+#[internal(path = "/get_edit_list", input = GetSubmissionListInput, output = Vec<EditSubmissions>, scope = SubmissionsScope, required = RequiredPermission::LoggedIn)]
 pub struct GetEditSubmissionsList;
 
 #[derive(Default, Endpoint)]
@@ -133,4 +140,22 @@ pub struct EditSubmissionCreation {
     pub status: Option<SubmissionStatus>,
 
     pub reviewer_id: Option<i32>,
+}
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/admin_submission_delete", input = SubmissionDeleteInput, scope = SubmissionsScope, required = RequiredPermission::LoggedIn, request = RequestMethod::Delete)]
+pub struct SubmissionDelete;
+
+#[derive(Default, Endpoint)]
+#[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
+#[internal(path = "/admin_edit_submission_delete", input = SubmissionDeleteInput, scope = SubmissionsScope, required = RequiredPermission::LoggedIn, request = RequestMethod::Delete)]
+pub struct EditSubmissionDelete;
+
+#[derive(Default, serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+pub struct SubmissionDeleteInput {
+    #[internal(id)]
+    id: i32,
+    #[internal(session_token)]
+    session_token: String,
 }

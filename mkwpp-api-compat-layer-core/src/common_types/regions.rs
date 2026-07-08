@@ -33,9 +33,10 @@ pub struct RegionsTemplate {
     pub player_count: either_field::either!(() | i32),
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Default, Clone, Copy, Debug, Hash, PartialEq, Eq)]
 #[cfg_attr(feature = "typescript-wasm", wasm_bindgen::prelude::wasm_bindgen)]
 pub enum RegionType {
+    #[default]
     World,
     Continent,
     CountryGroup,
