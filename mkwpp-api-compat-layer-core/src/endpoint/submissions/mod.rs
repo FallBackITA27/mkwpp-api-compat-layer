@@ -20,12 +20,12 @@ impl Scope for SubmissionsScope {
 }
 
 #[derive(Default, Endpoint)]
-#[internal(path = "/get_list", input = UserIdentificationData, output = Vec<Submissions>, scope = SubmissionsScope, required = RequiredPermission::LoggedIn)]
+#[internal(path = "/get_list", input = GetSubmissionListInput, output = Vec<Submissions>, scope = SubmissionsScope, required = RequiredPermission::LoggedIn)]
 pub struct GetSubmissionsList;
 
 #[derive(Default, serde::Deserialize, GetId, GetSessionToken, GetCategory)]
 pub struct GetSubmissionListInput {
-    pub full_list: bool, // Note: Only allow if logged in, TODO: Enforce with type system
+    pub full_list: bool, // Note: Only allow if admin, TODO: Enforce with type system
     #[internal(session_token)]
     pub session_token: String,
 }

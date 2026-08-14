@@ -1,4 +1,4 @@
-use super::to_route::ToActixRoute;
+use super::to_route::{ToActixRoute, ExtraInput};
 use crate::{
     endpoint::{
         Endpoint, Root, Scope,
@@ -35,7 +35,7 @@ use crate::{
         tracks::{GetTracks, TracksScope},
         users::{
             ActivateUser, AdminUserDelete, AdminUserEdit, AdminUserInsert, GetAdminUserList,
-            GetUser, IsAdmin, LoginUser, LogoutUser, PasswordForgot, PasswordReset,
+            GetUser, IsAdmin, LoginUser, LogoutUser, PasswordForgot, PasswordUpdate,PasswordReset,
             PasswordResetTokenCheck, RegisterUser, UsersScope,
         },
     },
@@ -87,7 +87,7 @@ mkwpp_api_compat_layer_macros::to_scope!(
         ],
         UsersScope: [
             ActivateUser, GetUser, LoginUser,
-            LogoutUser, PasswordForgot, PasswordReset,
+            LogoutUser, PasswordForgot, PasswordUpdate,PasswordReset,
             PasswordResetTokenCheck, RegisterUser, IsAdmin,
             AdminUserEdit, AdminUserDelete, AdminUserInsert, GetAdminUserList
         ],

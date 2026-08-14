@@ -8,6 +8,10 @@ use crate::{
     status_code::StatusCode,
 };
 
+pub struct ExtraInput {
+    pub ip: std::net::IpAddr
+}
+
 pub trait ToActixRoute: Endpoint
 where
     Self::InputStruct: serde::de::DeserializeOwned + 'static,
@@ -15,13 +19,14 @@ where
 {
     /// Only call this once, please.
     fn to_actix_route(
-        handler: impl AsyncFn(Self::InputStruct) -> PPResult<Self::OutputStruct> + 'static,
+        handler: impl AsyncFn(Self::InputStruct, ExtraInput) -> PPResult<Self::OutputStruct> + 'static,
     ) -> Route {
         let handler = std::sync::Arc::new(handler);
 
         let inner_handler = move |req: HttpRequest, data: Option<web::Json<Self::InputStruct>>| {
             let handler = handler.clone();
             async move {
+                // TODO: better code for getting inputs
                 let input: Self::InputStruct = match serde_urlencoded::from_str(req.query_string())
                 {
                     Ok(v) => v,
@@ -35,6 +40,10 @@ where
                     },
                 };
 
+                let extra_input = ExtraInput {
+                    ip: req.peer_addr().unwrap().ip()
+                };
+
                 if Self::REQUIRED_PERMISSION != RequiredPermission::None
                     && !Self::InputStruct::HAS_SESSION_TOKEN
                 {
@@ -44,7 +53,7 @@ where
                         .into_response(StatusCode::Forbidden));
                 }
 
-                let data = handler(input).await?;
+                let data = handler(input, extra_input).await?;
                 Ok::<HttpResponse, FinalErrorResponse>(HttpResponse::Ok().json(data))
             }
         };

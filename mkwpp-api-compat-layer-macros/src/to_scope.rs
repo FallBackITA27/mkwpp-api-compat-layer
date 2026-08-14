@@ -90,7 +90,7 @@ impl Scope {
                 Span::call_site(),
             );
             inputs.extend(quote! {
-                #new_ident: impl AsyncFn(<#endpoint as Endpoint>::InputStruct)
+                #new_ident: impl AsyncFn(<#endpoint as Endpoint>::InputStruct, ExtraInput)
                     -> PPResult<<#endpoint as Endpoint>::OutputStruct> + 'static,
             });
         }

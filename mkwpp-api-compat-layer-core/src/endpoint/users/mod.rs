@@ -32,9 +32,9 @@ pub struct LoginUser;
 #[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct LoginUserOutput {
     #[internal(session_token)]
-    session_token: String,
+    pub session_token: String,
 
-    expiry: UtcTimestamp,
+    pub expiry: UtcTimestamp,
 }
 
 #[derive(Default, Endpoint)]
@@ -45,9 +45,9 @@ pub struct LogoutUser;
 #[internal(path = "/activate", input = ActivateUserInput, scope = UsersScope)]
 pub struct ActivateUser;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct ActivateUserInput {
-    token: String,
+    pub token: String,
 }
 
 #[derive(Default, Endpoint)]
@@ -58,33 +58,45 @@ pub struct GetUser;
 #[internal(path = "/password_forgot", input = PasswordForgotInput, scope = UsersScope)]
 pub struct PasswordForgot;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct PasswordForgotInput {
-    email: Email,
+    pub email: Email,
+}
+
+#[derive(Default, Endpoint)]
+#[internal(path = "/password_update", input = PasswordUpdateInput, scope = UsersScope)]
+pub struct PasswordUpdate;
+
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
+pub struct PasswordUpdateInput {
+    pub old_password: Password,
+    pub new_password: Password,
+    #[internal(session_token)]
+    pub token: String,
 }
 
 #[derive(Default, Endpoint)]
 #[internal(path = "/password_reset", input = PasswordResetInput, scope = UsersScope)]
 pub struct PasswordReset;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct PasswordResetInput {
-    password: Password,
-    token: String,
+    pub password: Password,
+    pub token: String,
 }
 
 #[derive(Default, Endpoint)]
 #[internal(path = "/password_reset_token_check", input = PasswordResetTokenCheckInput, output = PasswordResetTokenCheckOutput, scope = UsersScope)]
 pub struct PasswordResetTokenCheck;
 
-#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Deserialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct PasswordResetTokenCheckInput {
-    token: String,
+    pub token: String,
 }
 
 #[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct PasswordResetTokenCheckOutput {
-    is_valid: bool,
+    pub is_valid: bool,
 }
 
 #[derive(Default, Endpoint)]
@@ -105,7 +117,7 @@ pub struct GetAdminUserList;
 #[derive(Default, serde::Serialize, GetId, GetCategory, GetSessionToken)]
 pub struct AdminUserView {
     #[internal(id)]
-    id: i32,
+    pub id: i32,
     pub username: String,
     pub email: String,
     pub is_superuser: bool,
@@ -151,7 +163,7 @@ pub struct AdminUserEditInput {
     #[internal(id)]
     pub id: i32,
     pub username: String,
-    pub password: String,
+    pub password: Option<String>,
     pub email: String,
     pub is_staff: bool,
     pub is_active: bool,

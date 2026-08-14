@@ -8,7 +8,7 @@ pub struct UserIdentificationData {
     session_token: String,
 }
 
-#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken)]
+#[derive(serde::Serialize, GetId, GetCategory, GetSessionToken, Default)]
 pub struct ClientSideUserData {
     pub player_id: Option<i32>,
     pub user_id: i32,
@@ -40,7 +40,7 @@ fn default() -> Self {
 }
 
 impl Username {
-    fn check_valid(&self) -> Result<(), ErrorCodes> {
+    pub fn check_valid(&self) -> Result<(), ErrorCodes> {
         match self.0.len() {
             0..=3 => Err(ErrorCodes::UsernameTooShort),
             151.. => Err(ErrorCodes::UsernameTooLong),
@@ -74,7 +74,7 @@ fn default() -> Self {
 }
 
 impl Email {
-    fn check_valid(&self) -> Result<(), ErrorCodes> {
+    pub fn check_valid(&self) -> Result<(), ErrorCodes> {
         let value = &self.0;
         if value.len() > 254 {
             return Err(ErrorCodes::EmailTooLong);
@@ -116,7 +116,7 @@ fn default() -> Self {
 }
 
 impl Password {
-    fn check_valid(&self) -> Result<(), ErrorCodes> {
+    pub fn check_valid(&self) -> Result<(), ErrorCodes> {
         let value = &self.0;
         let value = match value.len() {
             0..=8 => return Err(ErrorCodes::PasswordTooShort),
